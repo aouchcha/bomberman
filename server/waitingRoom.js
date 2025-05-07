@@ -1,8 +1,8 @@
 import { tile } from "./game/tile.js";
 import { createPlayer } from "./utils.js";
 
-const waitTimer = 1;
-const readyTimer = 1;
+const waitTimer = 20;
+const readyTimer = 10;
 
 export class WaitingRoom {
     constructor() {
