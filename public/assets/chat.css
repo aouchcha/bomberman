@@ -1,0 +1,141 @@
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(to bottom, rgb(191, 224, 2) 50%, rgb(42, 104, 0) 50%);
+}
+
+.chat-container {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 700px;
+    height: 790px;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.85);
+    border: 3px solid #4CAF50;
+    border-radius: 5px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+    font-family: 'Press Start 2P', monospace;
+}
+
+.chat-Header {
+    color: #fff;
+    font-size: 12px;
+    padding: 5px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid #4CAF50;
+    border-radius: 3px;
+    margin-bottom: 10px;
+}
+
+.message-Container {
+    flex-grow: 1;
+    overflow-y: auto;
+    margin-bottom: 10px;
+    color: #fff;
+    font-size: 12px;
+    padding: 5px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid #4CAF50;
+    border-radius: 3px;
+}
+
+.input-Container {
+    display: flex;
+    gap: 5px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 3px;
+    border-radius: 5px;
+}
+
+.message-Input {
+    flex-grow: 1;
+    padding: 10px 12px;
+    border-radius: 5px;
+    border: 2px solid #4CAF50;
+    background: rgba(13, 67, 0, 0.5);
+    color: #f5ec3d;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 14px;
+    outline: none;
+    min-width: 0;
+}
+
+.message-Input::placeholder {
+    color: #f5ec3d;
+
+}
+
+.message-Input:hover,
+.message-Input:focus {
+    border-color: #f5ec3d;
+
+}
+
+.send-Button {
+    padding: 5px 15px;
+    margin: 15px;
+    border-radius: 3px;
+    border: 2px solid #4CAF50;
+    background: #4CAF50;
+    color: #000;
+    cursor: pointer;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 12px;
+    text-transform: uppercase;
+    transition: all 0.2s;
+}
+
+.send-Button:hover {
+    background: #45a049;
+    transform: scale(1.05);
+}
+
+.message-Element {
+    margin: 5px 0;
+    padding: 8px;
+    background: rgba(76, 175, 80, 0.1);
+    border-left: 3px solid #4CAF50;
+    border-radius: 3px;
+    font-size: 12px;
+    line-height: 1.4;
+    word-wrap: break-word;
+}
+
+.timer-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.85);
+    color: #dfe4e0;
+    padding: 15px 30px;
+    border-radius: 5px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 16px;
+    text-align: center;
+    border: 2px solid #4CAF50;
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+    z-index: 1000;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+    }
+
+    50% {
+        box-shadow: 0 0 20px rgba(76, 175, 80, 0.8);
+    }
+
+    100% {
+        box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+    }
+}

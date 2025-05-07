@@ -1,0 +1,125 @@
+import { tile } from "./game/tile.js";
+import { createPlayer } from "./utils.js";
+
+const waitTimer = 1;
+const readyTimer = 1;
+
+export class WaitingRoom {
+    constructor() {
+        this.players = new Map();
+        this.status = 'waiting';
+        this.timerDuration = waitTimer;
+        this.postCountdown = readyTimer;
+        this.timer = null;
+    }
+
+    addPlayer(player) {
+        if (this.players.size == 2 && this.status == 'waiting') {
+            this.startTimer();
+        }
+
+        this.players.set(player.username, { socket: player.socket, send: player.send });
+        
+        if (this.status === 'postCountdown') {
+            this.removePlayer(player.socket)
+        }
+    }
+
+    removePlayer(playerId) {
+        this.players.delete(playerId);
+
+        if (this.players.size < 2) {
+            if (this.timer) {
+                clearInterval(this.timer);
+                this.timer = null;
+            }
+            this.status = 'waiting';
+            this.timerDuration = readyTimer;
+            this.broadcast({
+                type: 'timer',
+                status: "waiting",
+                time: this.timerDuration,
+            });
+        }
+    }
+
+    broadcast(message) {
+        const msg = JSON.stringify(message);
+        for (const player of this.players.values()) {
+            player.send(msg);
+        }
+    }
+
+    startTimer() {
+        if (this.timer) return;
+        this.status = 'countdown';
+
+        this.timer = setInterval(() => {
+            if (this.players.size == 4) {
+                this.stopTimer();
+                this.onCountdownEnd();
+            }
+
+            this.broadcast({
+                type: 'timer',
+                time: this.timerDuration,
+                status: this.status,
+            });
+
+            this.timerDuration--;
+
+            if (this.timerDuration < 0) {
+                this.stopTimer();
+                this.onCountdownEnd();
+            }
+        }, 1000);
+        this.timerDuration = waitTimer;
+    }
+
+    startPostCountdown() {
+        if (this.timer) {
+            clearInterval(this.timer);
+            this.timer = null;
+        }
+
+        this.status = 'postCountdown';
+        this.timerDuration = this.postCountdown;
+
+        this.timer = setInterval(() => {
+            this.broadcast({
+                type: 'postCountdown',
+                time: this.timerDuration,
+                status: this.status,
+            });
+
+            this.timerDuration--;
+
+            if (this.timerDuration < 0) {
+                this.stopTimer();
+                this.onGameStart();
+            }
+        }, 1000);
+        this.postCountdown = readyTimer;
+    }
+
+    stopTimer() {
+        if (this.timer) {
+            clearInterval(this.timer);
+            this.timer = null;
+        }
+    }
+
+    onCountdownEnd() {
+        this.startPostCountdown();
+    }
+
+    onGameStart() {
+        this.status = 'grid';
+        this.broadcast({
+            type: "grid",
+            players: [...this.players.keys()].map(p => ({ username: p.username })),
+            map: createPlayer(tile.board, this.players.size, [...this.players.keys()]),
+            position: { x: 1, y: 1 },
+        });
+    }
+}

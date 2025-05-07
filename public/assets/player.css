@@ -1,0 +1,86 @@
+:root {
+   --pixel-size: 4;
+   --steps: 3;
+   --character-move: -30%;
+}
+
+
+
+.Character {
+   height: 50px;
+   width: 50px;
+   overflow: hidden;
+   position: absolute;
+   will-change: transform;
+   z-index: 3;
+   top: 0px;
+   left: 0px;
+}
+
+.Character_spritesheet {
+   animation: moveSpritesheet 0.6s steps(var(--steps)) infinite;
+   width: calc(120px * var(--pixel-size));
+   position: absolute;
+}
+
+.Character_shadow {
+   position: absolute;
+   width: calc(32px * var(--pixel-size));
+   height: calc(32px * var(--pixel-size));
+}
+
+.pixelart {
+   image-rendering: pixelated;
+}
+
+.face-right {
+   left: 0;
+   top: calc(-39.5px * var(--pixel-size));
+   opacity: 0.9
+}
+
+.face-up {
+   left: 0;
+   top: calc(-27px * var(--pixel-size));
+   opacity: 0.9
+}
+
+.face-right-move {
+   left: 0;
+   top: calc(-91px * var(--pixel-size));
+   opacity: 0.9
+}
+
+.face-left {
+   left: 0;
+   top: calc(-14px * var(--pixel-size));
+   opacity: 0.9
+}
+
+.face-left-move {
+   left: 0;
+   top: calc(-65.5px * var(--pixel-size));
+   opacity: 0.9
+}
+
+.face-up-move {
+   left: 0;
+   top: calc(-78px * var(--pixel-size));
+   opacity: 0.9
+}
+
+.face-down-move {
+   left: 0;
+   top: calc(-52px * var(--pixel-size));
+   opacity: 0.9
+}
+
+@keyframes moveSpritesheet {
+   from {
+      transform: translate(0px, 0);
+   }
+
+   to {
+      transform: translate(var(--character-move), 0);
+   }
+}

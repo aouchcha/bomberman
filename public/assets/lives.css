@@ -1,0 +1,126 @@
+.lives-display {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    right: auto;
+    background: rgba(0, 0, 0, 0.85);
+    padding: 5px 30px;
+    border: 2px solid #ff4444;
+    border-radius: 5px;
+    color: white;
+    font-family: 'Press Start 2P', Arial, sans-serif;
+    font-size: 16px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+.lives-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.lives-icon {
+    font-size: 24px;
+    animation: heartbeat 1.5s infinite;
+}
+
+.lives-count {
+    font-weight: bold;
+    color: #ff4444;
+    text-shadow: 0 0 5px rgba(255, 68, 68, 0.5);
+}
+.eliminated {
+    opacity: 0.5;
+    text-decoration: line-through;
+}
+
+.winner-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.9);
+    padding: 30px;
+    border-radius: 15px;
+    color: white;
+    text-align: center;
+    z-index: 2000;
+}
+
+.winner-message h2 {
+    font-size: 36px;
+    margin-bottom: 20px;
+    color: #ffd700;
+}
+
+.winner-message p {
+    font-size: 24px;
+}
+
+@keyframes heartbeat {
+    0% {
+        transform: scale(1);
+    }
+
+    25% {
+        transform: scale(1.1);
+    }
+
+    50% {
+        transform: scale(1);
+    }
+
+    75% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Responsive styles */
+@media screen and (max-width: 768px) {
+    .lives-display {
+        top: 10px;
+        left: 10px;
+        right: auto;
+        padding: 8px 15px;
+        font-size: 14px;
+    }
+
+    .lives-icon {
+        font-size: 20px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .lives-display {
+        top: 5px;
+        left: 5px;
+        right: auto;
+        padding: 6px 12px;
+        font-size: 12px;
+        border-radius: 20px;
+    }
+
+    .lives-icon {
+        font-size: 18px;
+    }
+}

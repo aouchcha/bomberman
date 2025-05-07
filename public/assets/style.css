@@ -1,0 +1,254 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  height: 100vh;
+  display: flex;
+  flex-direction: row;
+  margin: 0;
+  overflow: hidden;
+}
+
+.root {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: row-reverse;
+  margin: 0;
+  padding: 0;
+  background-image: url(./background.png);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  position: relative;
+  overflow-y: scroll;
+}
+
+.chat {
+  width: 30%;
+  background-color: rgb(89, 95, 0);
+}
+
+.playersContainer {
+  height: 400px;
+  width: 300px;
+  background-color: rgb(240, 242, 223);
+}
+
+.container {
+  width: 1153px;
+  height: 770px;
+  margin: 20px;
+  position: relative;
+}
+
+.row {
+  display: flex;
+}
+
+.wall.box {
+  height: 50px;
+  width: 50px;
+  background-image: url(Bricks_01-128x128.png);
+  background-size: cover;
+  z-index: 2;
+}
+
+.path.box {
+  height: 50px;
+  width: 50px;
+  background-image: url(Texture_12_Diffuse.png);
+}
+
+.brick {
+  width: 50px;
+  height: 50px;
+  background-image: url(Bricks_15-128x128.png);
+  background-size: cover;
+}
+
+.player {
+  width: 50px;
+  height: 50px;
+  background-size: cover;
+  will-change: transform;
+  z-index: 2;
+}
+
+.power-up {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  z-index: 2;
+  animation: pulse 1s infinite;
+}
+
+.PowerUp {
+  position: absolute;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.powerup-orb {
+  border-radius: 50%;
+  box-shadow: 0 0 15px currentColor;
+  opacity: 0.8;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+}
+
+input {
+  display: block;
+  margin: 20px auto;
+  width: 200px;
+  height: 30px;
+  background-color: rgba(0, 0, 0, 0.5);
+  border: 2px solid #333;
+  border-radius: 5px;
+  color: #ff3333;
+  font-family: "Creepster", cursive;
+  font-size: 16px;
+  text-align: center;
+  padding: 5px;
+  outline: none;
+  caret-color: #ff3333;
+}
+
+input::placeholder {
+  color: #cc0000;
+  opacity: 0.7;
+}
+
+input:hover,
+input:focus {
+  border-color: #ff3333;
+  box-shadow: 0 0 5px rgba(255, 51, 51, 0.5);
+}
+
+.labelP {
+  position: absolute;
+  font-size: 22px;
+  font-weight: 600;
+  z-index: 4;
+}
+
+/* .message {
+    background-color: #ffeb3b; 
+    color: #333; 
+    padding: 15px 25px;
+    margin: 20px auto;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 10px;
+    width: fit-content;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    animation: pop 0.5s ease;
+} */
+
+.message {
+  display: grid;
+  position: absolute;
+  /* top: 0; */
+  left: 0;
+  z-index: 1000;
+  background-color: #ffffff;
+  color: #333;
+  /* padding: 15px 25px; */
+  /* margin: 20px auto; */
+  font-size: 70px;
+  font-weight: bold;
+  text-align: center;
+  border-radius: 10px;
+  width: 50%;
+  height: 300px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  animation: pop 0.5s ease;
+  transform: translate(50%, 100%);
+  text-align: center;
+  align-items: center;
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.player-count {
+  background-color: #4caf50;
+  color: white;
+  padding: 10px 20px;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s, transform 0.2s;
+  text-align: center;
+  user-select: none;
+}
+
+.player-count:hover {
+  background-color: #45a049;
+  transform: scale(1.05);
+}
+
+@media (max-width: 1500px) {
+  .root {
+    zoom: 80%;
+  }
+}
+
+@media (max-width: 1399.98px) {
+  .root {
+    zoom: 70%;
+  }
+}
+
+@media (max-width: 1199.98px) {
+  .root {
+    zoom: 60%;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .root {
+    zoom: 50%;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .root {
+    zoom: 40%;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .root {
+    zoom: 30%;
+  }
+}

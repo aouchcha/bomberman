@@ -1,0 +1,26 @@
+.music-button {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 10px 20px;
+    background: rgba(0, 0, 0, 0.85);
+    color: #4CAF50;
+    border: 2px solid #4CAF50;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 12px;
+    z-index: 1000;
+    transition: all 0.2s;
+}
+
+.music-button:hover {
+    background: #4CAF50;
+    color: #000;
+    transform: scale(1.05);
+}
+
+.music-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
