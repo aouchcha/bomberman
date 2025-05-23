@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <link rel="stylesheet" href="style.css"> -->
+    <title>Test</title>
+</head>
+
+<body>
+    <form onsubmit="login(this)">
+        <input type="text" name="username" placeholder="username">
+        <button type="submit">Login</button>
+    </form>
+    <script>
+        async function login(e) {
+            //e.preventDefault();
+            const username = e.username.value;
+            //alert("event here =>", username);
+            try {
+                const response = await fetch("/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                    })
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log("data", data);
+                    // const ws = new WebSocket('ws://localhost:3000/username=' + username);
+                    // ws.onopen = () => {
+                    //     console.log('WebSocket connection established.');
+                    //     //ws.send(username);
+                    // };
+                    // alert(data);
+                } else {
+                    alert("error in username");
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        }
+    </script>
+</body>
+
+</html>
