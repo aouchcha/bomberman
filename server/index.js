@@ -229,25 +229,14 @@ wss.on("connection", (ws, req) => {
         waitingRoom.removePlayer(player);
         playersUsernames.delete(username);
         setLength.len = playersUsernames.size;
-        // started = false;
-        // for (const [key, value] of waitingRoom.players.entries()) {
-        //     if (key !== username) {
-        //         value.send(JSON.stringify({
-        //             type: "xxx",
-        //             username: username,
-        //             message: `Game Over for player ${username}`,
-        //         }));
-        //     }
-        // }
-        // movingPlayer = {};
+
         console.log(`player ==================> `, playersUsernames);
         console.log(`player ==========> `, waitingRoom.players.size);
         console.log(`Started ==========> `, started);
         if (waitingRoom.players.size === 1) {
 
             console.log("game ended!!!!!!!!!!!!");
-            // isWin = true
-            // if (isWin) {
+
             for (const [key, value] of waitingRoom.players.entries()) {
                 console.log("OVEEEEEEEEEEEEEEEEEEEEEEEEEEEER wlad L9hab");
                 value.send(JSON.stringify({
@@ -255,16 +244,8 @@ wss.on("connection", (ws, req) => {
                     message: "Game Over",
                     username: key,
                 }));
-                // started = false;
-                //return;
-            }
 
-            // started = false;
-            // waitingRoom.players.clear();
-            // playersUsernames.clear();
-            // setLength.len = 0;
-            // console.log(`player array in CLOSE  `, playersUsernames);
-            // console.log(`player in CLOSE `, waitingRoom.players.size);
+            }
         }
     })
     console.log(`Started after close ==========> `, started);
