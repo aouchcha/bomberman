@@ -20,7 +20,7 @@ export function AddBomb(bomb) {
     bombs.push(bomb)
 }
 
-export function ResetPlayers() {
+export function ResetPlayers(ps) {
     players = ps.filter((pl) => {
         return pl.lives > 0
     })

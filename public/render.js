@@ -23,10 +23,12 @@ export function waitingRoom(ws) {
         grid: (data) => {
             console.log("map ==<", data.map)
             if (data.players.length >= 2 && data.players.length <= 4) {
-                gamestarted = true;
+                console.log("ALGAAAAAAAAAAAAAAAAAa");
+
+                // gamestarted = true;
                 ws.send(JSON.stringify({
                     type: "gamestarted",
-                    started: gamestarted
+                    started: true
                 }))
                 setStart(true)
                 setMap(data.map)
