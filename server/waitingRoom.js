@@ -1,8 +1,8 @@
 import { tile } from "./game/tile.js";
 import { createPlayer } from "./utils.js";
 
-const waitTimer = 20;
-const readyTimer = 10;
+const waitTimer = 1;
+const readyTimer = 1;
 
 export class WaitingRoom {
     constructor() {
@@ -18,16 +18,23 @@ export class WaitingRoom {
             this.startTimer();
         }
 
-        this.players.set(player.username, { socket: player.socket, send: player.send });
-        
+        // this.players.set(player.username, { socket: player.socket, send: player.send });
+        this.players.set(player.username, player.xx);
+
         if (this.status === 'postCountdown') {
-            this.removePlayer(player.socket)
+            this.removePlayer(player)
         }
+        // console.log("players ====>", this.players)
     }
-
     removePlayer(playerId) {
-        this.players.delete(playerId);
-
+        // console.log("playerId ===>", playerId)
+        const username = [...this.players.keys()].find(key => this.players.get(key) === playerId.xx);
+        console.log("pid ==> ", username)
+        const removedPlayer = this.players.get(username);
+        // console.log("removedPlayer ===>", removedPlayer.socket)
+        // const username = playerId.get()
+        this.players.delete(username);
+        console.log(`Player ${username} removed from the waiting room.`);
         if (this.players.size < 2) {
             if (this.timer) {
                 clearInterval(this.timer);
@@ -41,6 +48,7 @@ export class WaitingRoom {
                 time: this.timerDuration,
             });
         }
+        console.log("players in remove player ====>", this.players.size)
     }
 
     broadcast(message) {
@@ -115,6 +123,7 @@ export class WaitingRoom {
 
     onGameStart() {
         this.status = 'grid';
+        console.log(`onGameStart ====> size = ${this.players.size} , `, [...this.players.keys()])
         this.broadcast({
             type: "grid",
             players: [...this.players.keys()].map(p => ({ username: p.username })),

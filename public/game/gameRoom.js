@@ -20,12 +20,18 @@ export function AddBomb(bomb) {
     bombs.push(bomb)
 }
 
-export function ResetPlayers(ps) {
+export function ResetPlayers() {
     players = ps.filter((pl) => {
         return pl.lives > 0
     })
 }
-
+export function ResetPlayers2(ps, username) {
+    console.log("ps", ps);
+    console.log("username", username)
+    players = ps.filter((pl) => {
+        return pl.id == username;
+    })
+}
 export function gameRoom(tile, ws, setMap) {
     const [gameState, setGameState] = useState({
         players: [],
@@ -38,7 +44,7 @@ export function gameRoom(tile, ws, setMap) {
             attrs: {
                 class: "message",
             },
-            children: [`Player ${players[0].id} win`]
+            children: [`Player ${players[0].id} win, the game restart in 5 seconds`]
         }))
         ws.close()
     }
@@ -77,7 +83,7 @@ export function gameRoom(tile, ws, setMap) {
                                 lives: 3,
                             };
                             players.push(newPlayer);
-                            
+
                             // Initialize myPlayer if this is the current user
                             if (square === localStorage.getItem("player")) {
                                 window.myPlayer = newPlayer;
@@ -153,7 +159,7 @@ export function gameRoom(tile, ws, setMap) {
 
 
 export function createPlayer(player) {
-    
+
     return {
         tag: "div",
         attrs: {

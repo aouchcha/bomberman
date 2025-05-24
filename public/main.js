@@ -30,10 +30,15 @@ export function renderApp() {
                     console.log("were connected");
                 };
                 ws.onclose = () => (
-                    console.log("ws close")
+                    console.log("ws close"),
+                    localStorage.removeItem("player"),
+                    setTimeout(() => {
+                        window.location.reload()
+                    }, 5000)
                 )
                 setWait(false);
             } else {
+                console.log(result.message);
                 console.log('An error occurred while connecting.');
             }
 

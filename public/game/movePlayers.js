@@ -1,4 +1,4 @@
-import { players, ResetPlayers } from "./gameRoom.js";
+import { players, ResetPlayers, ResetPlayers2 } from "./gameRoom.js";
 import { render } from "../Apex/dom.js";
 
 const POWERUP_CHANCE = 0.5;
@@ -10,7 +10,7 @@ let myPlayer;
 const POWERUP_TYPES = {
     SPEED: 'speed',
     RANGE: 'range',
-    EXTRABOMB : 'ExtraBomb'
+    EXTRABOMB: 'ExtraBomb'
 };
 const directions = {
     keyUp: "up",
@@ -51,7 +51,13 @@ function movingPlayerAnimation(key, pressedKey, direction) {
 export function movePlayer(ws, updatePlayerState, setMap, setGameState) {
     ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
+        if (data.type == "xxx") {
+            console.log("l7wa");
 
+            ResetPlayers2(players, data.username)
+            updatePlayerState(players)
+            return;
+        }
         if (data.type === "mouvement") {
             players.forEach(player => {
                 if (player.id == data.id) {

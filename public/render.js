@@ -21,6 +21,7 @@ export function waitingRoom(ws) {
             setTimer(`Game starting very soon: ${data.time} seconds...`)
         },
         grid: (data) => {
+            console.log("map ==<", data.map)
             if (data.players.length >= 2 && data.players.length <= 4) {
                 gamestarted = true;
                 ws.send(JSON.stringify({
@@ -38,16 +39,29 @@ export function waitingRoom(ws) {
         },
         chat: (data) => {
             // if (!chat.includes(data.message)) {
-                setChat((prev) => [...prev, data.message])
+            setChat((prev) => [...prev, data.message])
             // }
         },
-        
+
+        xxx: (data) => {
+            //alert(data)
+            console.log(data);
+        }
+
     }
     if (currentMessageHandler) {
         ws.removeEventListener("message", currentMessageHandler);
     }
     currentMessageHandler = (e) => {
         const data = JSON.parse(e.data);
+        if (data.type == "xxx") {
+            console.log("OVEEEEEEEEEEEEEEEEEEEEEEEEEEEER");
+            // players.filter(player => {
+            //     player.username == data.username
+            // });
+            // updatePlayerState(players)
+            return;
+        }
         const handler = manageMsgs[data.type];
         if (handler) {
             handler(data);

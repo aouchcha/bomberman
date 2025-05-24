@@ -70,7 +70,7 @@ const wss = new WebSocketServer({ server });
 let once = true;
 let grid;
 let started = false;
-
+let isWin = false;
 wss.on("connection", (ws, req) => {
     const url = new URL(req.url, `http://${req.headers.host}`);
     const username = url.searchParams.get('username')
@@ -80,20 +80,30 @@ wss.on("connection", (ws, req) => {
     }
 
     const player = {
-        socket: ws,
         username,
-        send: (message) => ws.send(message)
+        xx: {
+            socket: ws,
+            send: (message) => ws.send(message)
+        },
     }
-
+    // console.log("player ===> ", player)
     waitingRoom.addPlayer(player);
     if (waitingRoom.players.size >= 2 && waitingRoom.status === "waiting") {
         waitingRoom.startTimer();
     }
-
-
-
+    // if (isWin) {
+    //     console.log("OVEEEEEEEEEEEEEEEEEEEEEEEEEEEER wlad L9hab");
+    //     ws.send(JSON.stringify({
+    //         type: "xxx",
+    //         message: "Game Over",
+    //         username: username,
+    //     }));
+    //     isWin = false;
+    //     return;
+    // }
     ws.on("message", (d) => {
         const data = JSON.parse(d);
+
         if (data.type == "gamestarted") {
             started = data.started;
         }
@@ -212,15 +222,52 @@ wss.on("connection", (ws, req) => {
                 }));
             }
         }
-
-
     })
 
     ws.on("close", () => {
-        waitingRoom.removePlayer(player.socket);
+
+        waitingRoom.removePlayer(player);
         playersUsernames.delete(username);
         setLength.len = playersUsernames.size;
+
+        // for (const [key, value] of waitingRoom.players.entries()) {
+        //     if (key !== username) {
+        //         value.send(JSON.stringify({
+        //             type: "xxx",
+        //             username: username,
+        //             message: `Game Over for player ${username}`,
+        //         }));
+        //     }
+        // }
+        // movingPlayer = {};
+        console.log(`player ==================> `, playersUsernames);
+        console.log(`player ==========> `, waitingRoom.players.size);
+
+        if (waitingRoom.players.size === 1 && started) {
+            console.log("game ended!!!!!!!!!!!!");
+            // isWin = true
+            // if (isWin) {
+            for (const [key, value] of waitingRoom.players.entries()) {
+                console.log("OVEEEEEEEEEEEEEEEEEEEEEEEEEEEER wlad L9hab");
+                value.send(JSON.stringify({
+                    type: "xxx",
+                    message: "Game Over",
+                    username: key,
+                }));
+                // isWin = false;
+                //return;
+            }
+
+            // started = false;
+            // waitingRoom.players.clear();
+            // playersUsernames.clear();
+            // setLength.len = 0;
+            // console.log(`player array in CLOSE  `, playersUsernames);
+            // console.log(`player in CLOSE `, waitingRoom.players.size);
+        }
     })
+    console.log(`player array after `, playersUsernames);
+    console.log(`player map after `, waitingRoom.players.size);
 })
 
 function updatePosition(direction, position, username) {
