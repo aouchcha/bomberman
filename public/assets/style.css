@@ -63,6 +63,13 @@ body {
   background-image: url(Texture_12_Diffuse.png);
 }
 
+.collision {
+  height: 50px;
+  width: 50px;
+  /* background-image: url(Effect_Explosion_1.png); */
+  z-index: 2;
+}
+
 .brick {
   width: 50px;
   height: 50px;

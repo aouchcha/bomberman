@@ -57,8 +57,9 @@ export function isEmpty(row, cell, tile) {
 }
 const BRICKS_NUMBER = 50;
 
-export function addBricksToBoard(tileMap) {
+export function addBricksToBoard(map) {
     let i = 0;
+    let tileMap = map
 
     while (i < BRICKS_NUMBER) {
         let row = Math.floor(Math.random() * tileMap.length);

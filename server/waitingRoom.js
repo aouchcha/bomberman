@@ -122,13 +122,16 @@ export class WaitingRoom {
     }
 
     onGameStart() {
+        // console.log("grid jdida !!!!")
         this.status = 'grid';
-        console.log(`onGameStart ====> size = ${this.players.size} , `, [...this.players.keys()])
+        // console.log({hh:tile.board[1]});
+        
+        //console.log(`onGameStart ====> size = ${this.players.size} , `, [...this.players.keys()])
         this.broadcast({
             type: "grid",
             players: [...this.players.keys()].map(p => ({ username: p.username })),
             map: createPlayer(tile.board, this.players.size, [...this.players.keys()]),
-            position: { x: 1, y: 1 },
+            // position: { x: 1, y: 1 },
         });
     }
 }

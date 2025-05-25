@@ -25,10 +25,10 @@ export function waitingRoom(ws) {
             if (data.players.length >= 2 && data.players.length <= 4) {
                 console.log("ALGAAAAAAAAAAAAAAAAAa");
 
-                // gamestarted = true;
+                gamestarted = true;
                 ws.send(JSON.stringify({
                     type: "gamestarted",
-                    started: true
+                    started: gamestarted
                 }))
                 setStart(true)
                 setMap(data.map)
@@ -57,7 +57,7 @@ export function waitingRoom(ws) {
     currentMessageHandler = (e) => {
         const data = JSON.parse(e.data);
         if (data.type == "xxx") {
-            console.log("OVEEEEEEEEEEEEEEEEEEEEEEEEEEEER");
+            //console.log("OVEEEEEEEEEEEEEEEEEEEEEEEEEEEER");
             // players.filter(player => {
             //     player.username == data.username
             // });

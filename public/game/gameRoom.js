@@ -81,15 +81,24 @@ export function gameRoom(tile, ws, setMap) {
                                 id: square,
                                 direction: "down",
                                 lives: 3,
+                                range: 1
                             };
                             players.push(newPlayer);
 
                             // Initialize myPlayer if this is the current user
-                            if (square === localStorage.getItem("player")) {
-                                window.myPlayer = newPlayer;
-                            }
+                            // if (square === localStorage.getItem("player")) {
+                            //     window.myPlayer = newPlayer;
+                            // }
                         }
                     }
+                    // else if (square.includes("bomb")) {
+                    //     bombs.push({
+                    //         position: {
+                    //             x: i,
+                    //             y: j,
+                    //         }
+                    //     })
+                    // }
                 });
             }
         });
@@ -139,10 +148,126 @@ export function gameRoom(tile, ws, setMap) {
                                 class: "wall box",
                             }
                         };
-                    } else {
-                        const player = players.find(p => p.id === square);
-                        if (player) {
-                            return createPlayer(player);
+                    } else if (`${square}` === "collision") {
+                        return (
+                            {
+                                tag: "div",
+                                attrs: {
+                                    //src: "./assets/Effect_Explosion_1.gif",
+                                    class: "path box",
+                                },
+                                children: [
+                                    {
+                                        tag: "img",
+                                        attrs: {
+                                            src: "./assets/Effect_Explosion_1.gif",
+                                            class: "collision",
+                                        }
+                                    }
+                                ]
+                            }
+                        )
+                    } else if (`${square}` === "speed") {
+                        return (
+                            {
+                                tag: "div",
+                                attrs: {
+                                    //src: "./assets/Effect_Explosion_1.gif",
+                                    class: "path box",
+                                },
+                                children: [
+                                    {
+                                        tag: "img",
+                                        attrs: {
+                                            src: "./assets/speed.png",
+                                            class: "collision",
+                                        }
+                                    }
+                                ]
+                            }
+                        )
+                    }else if (`${square}` === "range") {
+                        return (
+                            {
+                                tag: "div",
+                                attrs: {
+                                    //src: "./assets/Effect_Explosion_1.gif",
+                                    class: "path box",
+                                },
+                                children: [
+                                    {
+                                        tag: "img",
+                                        attrs: {
+                                            src: "./assets/range.png",
+                                            class: "collision",
+                                        }
+                                    }
+                                ]
+                            }
+                        )
+                    }else if (`${square}` === "ExtraBomb") {
+                        return (
+                            {
+                                tag: "div",
+                                attrs: {
+                                    //src: "./assets/Effect_Explosion_1.gif",
+                                    class: "path box",
+                                },
+                                children: [
+                                    {
+                                        tag: "img",
+                                        attrs: {
+                                            src: "./assets/extraBomb.png",
+                                            class: "collision",
+                                        }
+                                    }
+                                ]
+                            }
+                        )
+                    }
+                    else {
+                        if (!square.includes("bomb")) {
+                            const player = players.find(p => p.id === square);
+                            if (player) {
+                                return {
+                                    tag: "div",
+                                    attrs: {
+                                        class: "path box",
+                                    },
+                                    children: [
+                                        createPlayer(player)
+                                    ]
+                                }
+                            }
+                        } else {
+                            const slice = square.split("-");
+                            console.log(slice.length);
+                            if (slice.length == 2) {
+                                const player = players.find(p => p.id === slice[1]);
+                                if (player) {
+                                    return {
+                                        tag: "div",
+                                        attrs: {
+                                            class: "path box",
+                                        },
+                                        children: [
+                                            createBomb(i, j),
+                                            createPlayer(player)
+                                        ]
+                                    }
+                                }
+                            } else {
+                                return {
+                                    tag: "div",
+                                    attrs: {
+                                        class: "path box",
+                                    },
+                                    children: [
+                                        createBomb(i, j)
+                                    ]
+                                }
+                            }
+
                         }
                         return {
                             tag: "div",
@@ -163,36 +288,50 @@ export function createPlayer(player) {
     return {
         tag: "div",
         attrs: {
-            class: "path box",
+            class: "Character",
+            // id: player.id,
+            style: `position: absolute; top: ${player.position.x * 50}px; left: ${player.position.y * 50}px;`,
         },
         children: [
             {
-                tag: "div",
+                tag: "p",
                 attrs: {
-                    class: "Character",
-                    // id: player.id,
-                    style: `position: absolute; top: ${player.position.x * 50}px; left: ${player.position.y * 50}px;`,
+                    class: "labelP"
                 },
-                children: [
-                    {
-                        tag: "p",
-                        attrs: {
-                            class: "labelP"
-                        },
-                        children: [player.id]
-                    },
-                    {
-                        tag: "img",
-                        attrs: {
-                            class: `Character_spritesheet pixelart face-${player.direction}`,
-                            src: "assets/redLink.png",
-                            alt: "Character",
-                        }
-                    }
-                ]
+                children: [player.id]
             },
+            {
+                tag: "img",
+                attrs: {
+                    class: `Character_spritesheet pixelart face-${player.direction}`,
+                    src: "assets/redLink.png",
+                    alt: "Character",
+                }
+            }
         ]
-    };
+    }
+
+}
+
+export function createBomb(x, y) {
+
+    return {
+        attrs: {
+            class: "Bomber",
+            style: `height: 50px; width: 50px; position: absolute; top: ${x * 50}px; left: ${y * 50}px`
+        },
+        children: [
+            {
+                tag: "img",
+                attrs: {
+                    class: "bomber_spritesheet pixelart",
+                    src: "assets/bomb.png",
+                    alt: "Bomb"
+                }
+            }
+        ]
+    }
+
 }
 export function createLivesDisplay(ws) {
     const [lives, setLives] = useState(0);

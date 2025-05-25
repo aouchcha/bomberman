@@ -36,19 +36,31 @@ const keys = {
 }
 
 // let playerElement
-function movingPlayerAnimation(key, pressedKey, direction) {
+function movingPlayerAnimation(direction) {
     if (players.length > 0) {
         players.forEach(player => {
             if (player.id == localStorage.getItem("player")) {
-                player.direction = direction;
-                player.bombRange = player.bombRange || 1; // Initialize bomb range
+                // player.direction = direction;
+                // player.bombRange = player.bombRange || 1; // Initialize bomb range
                 myPlayer = player;
             }
         });
     }
 }
 
-export function movePlayer(ws, updatePlayerState, setMap, setGameState) {
+function updatingPlayer(newPlayer) {
+    if (players.length > 0) {
+        players.forEach(player => {
+            if (player.id == localStorage.getItem("player")) {
+                // player.direction = direction;
+                // player.bombRange = player.bombRange || 1; // Initialize bomb range
+                player = newPlayer;
+            }
+        });
+    }
+}
+
+export function movePlayer(ws, updatePlayerState, setMap) {
     ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
         if (data.type == "xxx") {
@@ -72,146 +84,49 @@ export function movePlayer(ws, updatePlayerState, setMap, setGameState) {
             myPlayer.direction = data.direction;
             updatePlayerState(myPlayer)
         } else if (data.type === "bombPlaced") {
-            const Bomb = render({
-                tag: "div",
-                attrs: {
-                    class: "Bomber",
-                    style: `height: 50px; width: 50px; position: absolute; top: ${data.position.x * 50}px; left: ${data.position.y * 50}px`
-                },
-                children: [
-                    {
-                        tag: "img",
-                        attrs: {
-                            class: "bomber_spritesheet pixelart",
-                            src: "assets/bomb.png",
-                            alt: "Bomb"
-                        }
-                    }
-                ]
-            })
-            document.querySelector(".container").appendChild(Bomb)
-            setTimeout(() => {
-                Bomb.remove()
-            }, 5000);
+            console.log({ grid: data.grid });
+            setMap(data.grid)
         }
         else if (data.type === "bombExploded") {
-            const bombRange = (data.username === myPlayer?.id ? myPlayer.bombRange : 1) * 50; // Convert range to pixels
-            const explosion = render({
-                tag: "div",
-                attrs: {
-                    class: "explosion",
-                    style: `position: absolute; top: ${data.position.x * 50}px; left: ${data.position.y * 50}px;`
-                },
-                children: [
-                    // Center explosion
-                    {
-                        tag: "div",
-                        attrs: {
-                            class: "explosion-center"
-                        }
-                    },
-                    // Right ray
-                    {
-                        tag: "div",
-                        attrs: {
-                            class: "explosion-ray horizontal",
-                            style: `left: 50px; width: ${bombRange}px;`
-                        }
-                    },
-                    // Left ray
-                    {
-                        tag: "div",
-                        attrs: {
-                            class: "explosion-ray horizontal",
-                            style: `right: 50px; width: ${bombRange}px; transform-origin: right;`
-                        }
-                    },
-                    // Down ray
-                    {
-                        tag: "div",
-                        attrs: {
-                            class: "explosion-ray vertical",
-                            style: `top: 50px; height: ${bombRange}px;`
-                        }
-                    },
-                    // Up ray
-                    {
-                        tag: "div",
-                        attrs: {
-                            class: "explosion-ray vertical",
-                            style: `bottom: 50px; height: ${bombRange}px; transform-origin: bottom;`
-                        }
-                    }
-                ]
-            });
-
-            document.querySelector(".container").appendChild(explosion);
-
-            // Remove explosion effect after animation
-            setTimeout(() => {
-                explosion.remove();
-            }, 500);
-
             ws.send(JSON.stringify({
                 type: 'test',
                 bomb: true,
                 players: players,
                 bombCorrds: data.position,
-                range: data.username === myPlayer?.id ? myPlayer.bombRange : 1 // Send range to server
+                myplayer: data.myplayer,
             }));
         } else if (data.type === "newgrid") {
+            console.log("new grid ==>", data.grid)
             ResetPlayers(data.players);
             setMap(data.grid);
-        } else if (data.type === "powerUpSpawned") {
-            const PowerUp = render({
-                tag: "div",
-                attrs: {
-                    class: "PowerUp",
-                    style: `height: 30px; width: 30px; position: absolute; top: ${data.position.x * 50 + 10}px; left: ${data.position.y * 50 + 10}px`
-                },
-                children: [{
-                    tag: "div",
-                    attrs: {
-                        class: `powerup-orb ${data.powerUpType}`,
-                        style: "width: 100%; height: 100%; animation: pulse 1s infinite"
-                    }
-                }]
-            });
-
-            document.querySelector(".container").appendChild(PowerUp);
-
-            // Store power-up reference for removal later
-            setGameState(prevState => ({
-                ...prevState,
-                powerUps: new Map(prevState.powerUps).set(`${data.position.x},${data.position.y}`, {
-                    type: data.powerUpType,
-                    element: PowerUp
-                })
-            }));
-        } else if (data.type === "powerUpCollected") {
+        }
+        else if (data.type === "powerUpCollected") {
+            updatingPlayer(data.myplayer)
+            updatePlayerState(data.players)
+            // setMap(data.grid);
             // Remove power-up element
-            const powerUpKey = `${data.position.x},${data.position.y}`;
-            setGameState(prevState => {
-                const powerUps = new Map(prevState.powerUps);
-                const powerUp = powerUps.get(powerUpKey);
-                if (powerUp?.element) {
-                    powerUp.element.remove();
-                }
-                powerUps.delete(powerUpKey);
-                return {
-                    ...prevState,
-                    powerUps: powerUps
-                };
-            });
+            // const powerUpKey = `${data.position.x},${data.position.y}`;
+            // setGameState(prevState => {
+            //     const powerUps = new Map(prevState.powerUps);
+            //     const powerUp = powerUps.get(powerUpKey);
+            //     if (powerUp?.element) {
+            //         powerUp.element.remove();
+            //     }
+            //     powerUps.delete(powerUpKey);
+            //     return {
+            //         ...prevState,
+            //         powerUps: powerUps
+            //     };
+            // });
 
             // Apply power-up effect if it's the current player
-            if (window.myPlayer && data.playerId === window.myPlayer.id) {
-                if (data.powerUpType === POWERUP_TYPES.SPEED) {
-                    window.myPlayer.speed = (window.myPlayer.speed || 1) * 1.5;
-                } else if (data.powerUpType === POWERUP_TYPES.RANGE) {
-                    window.myPlayer.bombRange = (window.myPlayer.bombRange || 1) + 1;
-                }
-            }
+            // if (window.myPlayer && data.playerId === window.myPlayer.id) {
+            //     if (data.powerUpType === POWERUP_TYPES.SPEED) {
+            //         window.myPlayer.speed = (window.myPlayer.speed || 1) * 1.5;
+            //     } else if (data.powerUpType === POWERUP_TYPES.RANGE) {
+            //         window.myPlayer.bombRange = (window.myPlayer.bombRange || 1) + 1;
+            //     }
+            // }
         }
     }
     const bombing = throttle(function () {
@@ -221,7 +136,10 @@ export function movePlayer(ws, updatePlayerState, setMap, setGameState) {
             bomb: true,
             position: myPlayer.position,
             lastKey: 'Space',
-            username: myPlayer.id
+            username: myPlayer.id,
+            players: players,
+            myplayer: myPlayer,
+
         }));
     }, 5000)
 
@@ -235,6 +153,7 @@ export function movePlayer(ws, updatePlayerState, setMap, setGameState) {
                     position: myPlayer.position,
                     username: myPlayer.id,
                     lastKey: 'z',
+                    myplayer: myPlayer,
                 }));
                 break;
             case 'ArrowLeft':
@@ -244,7 +163,8 @@ export function movePlayer(ws, updatePlayerState, setMap, setGameState) {
                     direction: directions.keyLeft,
                     position: myPlayer.position,
                     username: myPlayer.id,
-                    lastKey: 'a'
+                    lastKey: 'a',
+                    myplayer: myPlayer,
                 }));
                 break;
             case 'ArrowDown':
@@ -254,7 +174,9 @@ export function movePlayer(ws, updatePlayerState, setMap, setGameState) {
                     direction: directions.keyDown,
                     position: myPlayer.position,
                     username: myPlayer.id,
-                    lastKey: 's'
+                    lastKey: 's',
+                    myplayer: myPlayer,
+                    players: players
                 }));
                 break;
             case 'ArrowRight':
@@ -265,6 +187,7 @@ export function movePlayer(ws, updatePlayerState, setMap, setGameState) {
                     position: myPlayer.position,
                     username: myPlayer.id,
                     lastKey: 'd',
+                    myplayer: myPlayer,
                 }));
                 break;
             case ' ':
