@@ -110,12 +110,14 @@ wss.on("connection", (ws, req) => {
 
         let movingPlayer = {};
         if (data.type == "move") {
-            let position = updatePosition(data.direction, data.position, data.username, data.myplayer, data.players)
+            let { position, players } = updatePosition(data.direction, data.position, data.username, data.myplayer, data.players)
             movingPlayer = data
             ws.send(JSON.stringify({
                 type: "self-update",
                 id: movingPlayer.username,
                 direction: movingPlayer.direction,
+                grid: grid,
+                players: players,
                 position: position
             }));
             for (const [key, value] of waitingRoom.players.entries()) {
@@ -124,6 +126,8 @@ wss.on("connection", (ws, req) => {
                         type: "mouvement",
                         id: movingPlayer.username,
                         direction: movingPlayer.direction,
+                        grid: grid,
+                        players: players,
                         position: position
                     }));
                 }
@@ -135,14 +139,14 @@ wss.on("connection", (ws, req) => {
         if (data.type == "bombPlaced") {
             const bombPosition = { ...data.position };
             grid[bombPosition.x][bombPosition.y] = `bomb-${data.username}`;
-            console.log(powerUps);
-            
+            // console.log(powerUps);
+
             // Reset non-wall/brick tiles to path
             for (let i = 0; i < grid.length; i++) {
                 for (let j = 0; j < grid[i].length; j++) {
-                    if (grid[i][j] !== "brick" && grid[i][j] !== "wall" && !grid[i][j].includes("bomb") && !powerUps.has({x:i, y:j})) {
-                        console.log({check:!powerUps.has(i,j), content: grid[i][j]});
-                        
+                    if (grid[i][j] !== "brick" && grid[i][j] !== "wall" && !grid[i][j].includes("bomb") && !powerUps.has(`${i},${j}`)) {
+                        // console.log({check:!powerUps.has(i,j), content: grid[i][j]});
+
                         grid[i][j] = "path";
                     }
                 }
@@ -178,19 +182,43 @@ wss.on("connection", (ws, req) => {
             // console.log(data.myplayer);
 
             // Check all 4 directions around the bomb with the specified range
+            // const range = data.myplayer.range || 1;
+            // const directions = [];
+
+            // Generate coordinates for each direction based on range
             const range = data.myplayer.range || 1;
             const directions = [];
 
-            // Generate coordinates for each direction based on range
-            for (let i = 0; i <= range; i++) {
-                directions.push(
-                    { x: data.bombCorrds.x - i, y: data.bombCorrds.y }, // Up
-                    { x: data.bombCorrds.x + i, y: data.bombCorrds.y }, // Down
-                    { x: data.bombCorrds.x, y: data.bombCorrds.y - i }, // Left
-                    { x: data.bombCorrds.x, y: data.bombCorrds.y + i }  // Right
-                );
+            const originX = data.bombCorrds.x;
+            const originY = data.bombCorrds.y;
+            directions.push({ x: originX, y: originY })
+            // Up
+            for (let i = 1; i <= range; i++) {
+                const newX = originX - i;
+                if (newX < 0 || grid[newX][originY] === 'wall') break;
+                directions.push({ x: newX, y: originY });
             }
 
+            // Down
+            for (let i = 1; i <= range; i++) {
+                const newX = originX + i;
+                if (newX >= tile.board.height || grid[newX][originY] === 'wall') break;
+                directions.push({ x: newX, y: originY });
+            }
+
+            // Left
+            for (let i = 1; i <= range; i++) {
+                const newY = originY - i;
+                if (newY < 0 || grid[originX][newY] === 'wall') break;
+                directions.push({ x: originX, y: newY });
+            }
+
+            // Right
+            for (let i = 1; i <= range; i++) {
+                const newY = originY + i;
+                if (newY >= tile.board.width || grid[originX][newY] === 'wall') break;
+                directions.push({ x: originX, y: newY });
+            }
             // Check each position in the explosion range
             directions.forEach(pos => {
 
@@ -200,13 +228,13 @@ wss.on("connection", (ws, req) => {
                     if (grid[pos.x][pos.y] === "brick" || grid[pos.x][pos.y] === "path") {
                         if (grid[pos.x][pos.y] === "brick") {
                             // console.log({ x: pos.x, y: pos.y });
-
+                            const types = [POWERUP_TYPES.SPEED, POWERUP_TYPES.RANGE, POWERUP_TYPES.EXTRABOMB];
+                            const type = types[Math.floor(Math.random() * types.length)];
+                            powerUps.set(`${pos.x},${pos.y}`, type);
                             // SuperPowers.push({ x: pos.x, y: pos.y })
-                            // powerUps.set(`${position.x},${position.y}`, type);
-
-                            trySpawnPowerUp(pos, grid);
                         }
                         grid[pos.x][pos.y] = 'collision';
+                        // trySpawnPowerUp(pos);
                     }
                 }
             });
@@ -241,33 +269,41 @@ wss.on("connection", (ws, req) => {
 
             for (const [key, value] of waitingRoom.players.entries()) {
                 value.send(JSON.stringify({
-                    type: "newgrid",
+                    type: "newgrid1",
                     grid: grid,
-                    players: data.players,
+                    // players: data.players,
                 }));
             }
 
             setTimeout(() => {
                 for (let i = 0; i < grid.length; i++) {
                     for (let j = 0; j < grid[i].length; j++) {
-                        if (grid[i][j] == "collision") {
+                        if (grid[i][j] !== "brick" && grid[i][j] !== "wall" && !grid[i][j].includes("bomb") && !powerUps.has(`${i},${j}`)) {
                             grid[i][j] = "path";
                         }
                     }
                 }
                 data.players.forEach(pl => {
-                    if (pl.id != data.username) {
-                        grid[pl.position.x][pl.position.y] = pl.id;
-                    }
+                    grid[pl.position.x][pl.position.y] = pl.id;
                 });
 
-                powerUps.forEach((key, _) => {
-                    trySpawnPowerUp(key, grid)
+                // SuperPowers.forEach((pos) => {
+                //     trySpawnPowerUp(pos)
+                // })
+
+                powerUps.forEach((key, value) => {
+                    console.log({ key, value });
+                    console.log(typeof value);
+
+                    const coords = value.split(',')
+                    console.log(coords);
+
+                    grid[parseInt(coords[0])][parseInt(coords[1])] = key
                 })
 
                 for (const [key, value] of waitingRoom.players.entries()) {
                     value.send(JSON.stringify({
-                        type: "newgrid",
+                        type: "newgrid2",
                         grid: grid,
                         players: data.players,
                     }));
@@ -316,7 +352,9 @@ wss.on("connection", (ws, req) => {
 })
 
 function updatePosition(direction, position, username, myplayer, players) {
-    if (Obstacles(position, direction, username)) {
+    console.log(Obstacles(position, direction));
+
+    if (Obstacles(position, direction)) {
         if (direction === 'up') {
             position.x -= 1
         } else if (direction === 'down') {
@@ -327,49 +365,65 @@ function updatePosition(direction, position, username, myplayer, players) {
             position.y += 1
         }
     }
+    console.log(position);
 
     // Check if player moved to a power-up position
     const powerUpKey = `${position.x},${position.y}`;
     if (powerUps.has(powerUpKey)) {
         const powerUpType = powerUps.get(powerUpKey);
+        // console.log(players);
+        // console.log(myplayer);
+
         switch (powerUpType) {
             case 'range':
                 players.forEach((p) => {
-                    if (p.username == myplayer.id && p.range < 4) {
+                    if (p.id == myplayer.id && p.range < 4) {
+                        console.log("hanni");
+
                         grid[position.x][position.y] = "path";
                         p.range += 1;
                     }
                 })
-                // myplayer.range += 1;
+                break;
+            case 'speed':
+                // players.forEach((p) => {
+                //     if (p.id == myplayer.id && p.range < 4) {
+                //         console.log("hanni");
+
+                //         grid[position.x][position.y] = "path";
+                //         p.range += 1;
+                //     }
+                // })
                 break;
         }
         // console.log({key:powerUpKey, type:powerUpType});
-        
+
         powerUps.delete(powerUpKey);
-        for (const [key, value] of waitingRoom.players.entries()) {
-            value.send(JSON.stringify({
-                type: "powerUpCollected",
-                grid: grid,
-                position: position,
-                powerUpType: powerUpType,
-                playerId: username,
-                players: players
-                // players:data.players,
-            }));
-        }
+        setTimeout(() => {
+            for (const [_, value] of waitingRoom.players.entries()) {
+                value.send(JSON.stringify({
+                    type: "powerUpCollected",
+                    grid: grid,
+                    position: position,
+                    powerUpType: powerUpType,
+                    playerId: username,
+                    players: players
+                }));
+            }
+        }, 1000);
+
     }
-    return position
+    return { position, players }
 }
 
-function trySpawnPowerUp(position, grid) {
+function trySpawnPowerUp(position) {
     // console.log(position);
 
     // Remove random chance - always spawn a power-up
-    const types = [POWERUP_TYPES.SPEED, POWERUP_TYPES.RANGE, POWERUP_TYPES.EXTRABOMB];
-    const type = types[Math.floor(Math.random() * types.length)];
-    powerUps.set({x:position.x, y:position.y}, type);
+    // const types = [POWERUP_TYPES.SPEED, POWERUP_TYPES.RANGE, POWERUP_TYPES.EXTRABOMB];
+    // const type = types[Math.floor(Math.random() * types.length)];
     // powerUps.set(`${position.x},${position.y}`, type);
-    grid[position.x][position.y] = type;
+    // grid[position.x][position.y] = type;
     // for (const [key, value] of waitingRoom.players.entries()) {
     //     value.send(JSON.stringify({
     //         type: "powerUpSpawned",
@@ -379,7 +433,7 @@ function trySpawnPowerUp(position, grid) {
     // }
 }
 
-function Obstacles(position, direction, username) {
+function Obstacles(position, direction) {
     if (started) {
         checkSomething(grid);
         started = false;
@@ -387,7 +441,9 @@ function Obstacles(position, direction, username) {
     const nextX = position.y + (direction === 'right' ? 1 : direction === 'left' ? -1 : 0);
     const nextY = position.x + (direction === 'down' ? 1 : direction === 'up' ? -1 : 0);
 
-    if (grid[nextY] && grid[nextY][nextX] == "bomb" || grid[nextY][nextX] == "wall" || grid[nextY][nextX] == "brick" || grid[nextY][nextX] == username) {
+    if (grid[nextY] && grid[nextY][nextX] == "bomb" || grid[nextY][nextX] == "wall" || grid[nextY][nextX] == "brick") {
+        // console.log(grid[nextX][nextY]);
+
         return false;
     }
     return true;

@@ -24,7 +24,10 @@ export function ResetPlayers(ps) {
     players = ps.filter((pl) => {
         return pl.lives > 0
     })
+    console.log({ players });
+
 }
+
 export function ResetPlayers2(ps, username) {
     console.log("ps", ps);
     console.log("username", username)
@@ -33,6 +36,7 @@ export function ResetPlayers2(ps, username) {
     })
 }
 export function gameRoom(tile, ws, setMap) {
+    console.log("new map ===>", tile);
     const [gameState, setGameState] = useState({
         players: [],
         bombs: [],
@@ -186,7 +190,7 @@ export function gameRoom(tile, ws, setMap) {
                                 ]
                             }
                         )
-                    }else if (`${square}` === "range") {
+                    } else if (`${square}` === "range") {
                         return (
                             {
                                 tag: "div",
@@ -205,7 +209,7 @@ export function gameRoom(tile, ws, setMap) {
                                 ]
                             }
                         )
-                    }else if (`${square}` === "ExtraBomb") {
+                    } else if (`${square}` === "ExtraBomb") {
                         return (
                             {
                                 tag: "div",

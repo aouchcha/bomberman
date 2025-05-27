@@ -95,38 +95,17 @@ export function movePlayer(ws, updatePlayerState, setMap) {
                 bombCorrds: data.position,
                 myplayer: data.myplayer,
             }));
-        } else if (data.type === "newgrid") {
+        }else if (data.type == "newgrid1") {
+            setMap(data.grid);
+        } else if (data.type === "newgrid2") {
             console.log("new grid ==>", data.grid)
             ResetPlayers(data.players);
             setMap(data.grid);
         }
         else if (data.type === "powerUpCollected") {
-            updatingPlayer(data.myplayer)
-            updatePlayerState(data.players)
-            // setMap(data.grid);
-            // Remove power-up element
-            // const powerUpKey = `${data.position.x},${data.position.y}`;
-            // setGameState(prevState => {
-            //     const powerUps = new Map(prevState.powerUps);
-            //     const powerUp = powerUps.get(powerUpKey);
-            //     if (powerUp?.element) {
-            //         powerUp.element.remove();
-            //     }
-            //     powerUps.delete(powerUpKey);
-            //     return {
-            //         ...prevState,
-            //         powerUps: powerUps
-            //     };
-            // });
-
-            // Apply power-up effect if it's the current player
-            // if (window.myPlayer && data.playerId === window.myPlayer.id) {
-            //     if (data.powerUpType === POWERUP_TYPES.SPEED) {
-            //         window.myPlayer.speed = (window.myPlayer.speed || 1) * 1.5;
-            //     } else if (data.powerUpType === POWERUP_TYPES.RANGE) {
-            //         window.myPlayer.bombRange = (window.myPlayer.bombRange || 1) + 1;
-            //     }
-            // }
+            ResetPlayers(data.players);
+            updatePlayerState(data.myplayer)
+            setMap(data.grid);
         }
     }
     const bombing = throttle(function () {
@@ -154,6 +133,7 @@ export function movePlayer(ws, updatePlayerState, setMap) {
                     username: myPlayer.id,
                     lastKey: 'z',
                     myplayer: myPlayer,
+                    players: players
                 }));
                 break;
             case 'ArrowLeft':
@@ -165,6 +145,7 @@ export function movePlayer(ws, updatePlayerState, setMap) {
                     username: myPlayer.id,
                     lastKey: 'a',
                     myplayer: myPlayer,
+                    players: players
                 }));
                 break;
             case 'ArrowDown':
@@ -188,6 +169,7 @@ export function movePlayer(ws, updatePlayerState, setMap) {
                     username: myPlayer.id,
                     lastKey: 'd',
                     myplayer: myPlayer,
+                    players: players
                 }));
                 break;
             case ' ':
