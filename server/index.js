@@ -111,7 +111,7 @@ wss.on("connection", (ws, req) => {
         let movingPlayer = {};
         if (data.type == "move") {
             // console.log(data);
-            
+
             let { position, players, myplayer } = updatePosition(data.direction, data.position, data.username, data.myplayer, data.players)
             movingPlayer = data
 
@@ -323,6 +323,20 @@ wss.on("connection", (ws, req) => {
                         // }
                         if (pl.position.x == pos.x && pl.position.y == pos.y) {
                             pl.lives--;
+                            for (const [key, value] of waitingRoom.players.entries()) {
+                                if (key == pl.id) {
+                                    value.send(JSON.stringify({
+                                        type: "playerLives",
+                                        lives: pl.lives,
+                                        id: pl.id
+                                    }));
+                                }
+                            }
+                            ws.send(JSON.stringify({
+                                type: "playerLives",
+                                lives: pl.lives,
+                                id: pl.id
+                            }))
                             return
                         }
                     }
@@ -495,7 +509,7 @@ function updatePosition(direction, position, username, myplayer, players) {
                 break;
         }
         // console.log({key:powerUpKey, type:powerUpType});
-        
+
         powerUps.delete(powerUpKey);
         setTimeout(() => {
             for (const [_, value] of waitingRoom.players.entries()) {
@@ -535,7 +549,7 @@ function trySpawnPowerUp(position) {
 
 function Obstacles(position, direction, myplayer) {
     // console.log({myplayer});
-    
+
     if (started) {
         checkSomething(grid);
         started = false;

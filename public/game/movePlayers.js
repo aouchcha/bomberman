@@ -64,14 +64,14 @@ export function movePlayer(ws, updatePlayerState, setMap) {
     ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
         if (data.type == "xxx") {
-            console.log("l7wa");
+            //console.log("l7wa");
 
             ResetPlayers2(players, data.username)
             updatePlayerState(players)
             return;
         }
         if (data.type === "mouvement") {
-            console.log({players: data.players});
+            //console.log({players: data.players});
             
             players.forEach(player => {
                 if (player.id == data.id) {
@@ -87,7 +87,7 @@ export function movePlayer(ws, updatePlayerState, setMap) {
         else if (data.type === "self-update") {
             myPlayer.position = data.position;
             myPlayer.direction = data.direction;
-            console.log(data.myplayer);
+            //console.log(data.myplayer);
             
             updatePlayerState(data.myplayer)
             ResetPlayers(data.players);
@@ -139,7 +139,7 @@ export function movePlayer(ws, updatePlayerState, setMap) {
             //     players: players,
             //     myplayer: myPlayer
             // }));
-            console.log({PP:data.players});
+            //console.log({PP:data.players});
             
             ResetPlayers(data.players);
             // updatePlayerState(data.myplayer)

@@ -29,7 +29,7 @@ export class WaitingRoom {
     removePlayer(playerId) {
         // console.log("playerId ===>", playerId)
         const username = [...this.players.keys()].find(key => this.players.get(key) === playerId.xx);
-        console.log("pid ==> ", username)
+        //console.log("pid ==> ", username)
         //const removedPlayer = this.players.get(username);
         // console.log("removedPlayer ===>", removedPlayer.socket)
         // const username = playerId.get()

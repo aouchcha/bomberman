@@ -17,13 +17,13 @@ export function waitingRoom(ws) {
 
     const manageMsgs = {
         timer: (data) => {
-            console.log("waiting room data =>", data)
+            //console.log("waiting room data =>", data)
             setTimer(`Game starting in: ${data.time} seconds...
                 `)
             setNb(`players waiting : ${data.playersNumber}`)
         },
         postCountdown: (data) => {
-            console.log("post count down ===>", data)
+            //console.log("post count down ===>", data)
             // data.usernames.forEach(u => {
             // });
             setTimer(`Game starting soon: ${data.time} seconds...\n
@@ -32,7 +32,7 @@ export function waitingRoom(ws) {
             //setUsers(data.usernames)
         },
         grid: (data) => {
-            console.log("map ==<", data.map)
+            //console.log("map ==<", data.map)
             if (data.players.length >= 2 && data.players.length <= 4) {
                 gamestarted = true;
                 ws.send(JSON.stringify({
@@ -54,10 +54,12 @@ export function waitingRoom(ws) {
             // }
         },
 
-        xxx: (data) => {
-            //alert(data)
-            console.log(data);
-        }
+        // xxx: (data) => {
+        //     //alert(data)
+        // },
+        // playerLives: (data) => {
+        //     console.log("data of lives =>", data);
+        // }
 
     }
     if (currentMessageHandler) {

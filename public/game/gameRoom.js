@@ -112,7 +112,7 @@ export function gameRoom(tile, ws, setMap) {
         });
 
     }
-    console.log(x);
+    //console.log(x);
     movePlayer(ws, updatePlayerState, setMap, setGameState)
 
     return {
@@ -351,14 +351,18 @@ export function createBomb(x, y) {
 
 }
 export function createLivesDisplay(ws) {
-    const [lives, setLives] = useState(0);
-
+    const [lives, setLives] = useState(3);
+    // console.log("lives initial", lives)
     ws.addEventListener("message", (event) => {
         const data = JSON.parse(event.data);
-        if (data.type === "PlayerLives") {
-            setLives(data.live);
+        // console.log("data from loosing lives ==>", data.lives)
+        if (data.type === "playerLives") {
+            setLives(data.lives);
+            // console.log("data lives ==>", data)
+            //console.log("lives after set ==>", lives);
         }
     });
+    console.log("final values ==>", lives);
 
     return {
         tag: "div",
