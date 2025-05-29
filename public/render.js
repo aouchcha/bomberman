@@ -9,22 +9,31 @@ let currUser;
 
 export function waitingRoom(ws) {
     const [timer, setTimer] = useState('Waiting...');
+    const [users, setUsers] = useState([]);
+    const [nb, setNb] = useState('');
     const [chat, setChat] = useState([]);
     const [start, setStart] = useState(false);
     const [map, setMap] = useState();
 
     const manageMsgs = {
         timer: (data) => {
-            setTimer(`Game starting in: ${data.time} seconds...`)
+            console.log("waiting room data =>", data)
+            setTimer(`Game starting in: ${data.time} seconds...
+                `)
+            setNb(`players waiting : ${data.playersNumber}`)
         },
         postCountdown: (data) => {
-            setTimer(`Game starting very soon: ${data.time} seconds...`)
+            console.log("post count down ===>", data)
+            // data.usernames.forEach(u => {
+            // });
+            setTimer(`Game starting soon: ${data.time} seconds...\n
+                    `)
+            setNb(`players ready: ${data.playersNumber}`)
+            //setUsers(data.usernames)
         },
         grid: (data) => {
             console.log("map ==<", data.map)
             if (data.players.length >= 2 && data.players.length <= 4) {
-                console.log("ALGAAAAAAAAAAAAAAAAAa");
-
                 gamestarted = true;
                 ws.send(JSON.stringify({
                     type: "gamestarted",
@@ -75,16 +84,19 @@ export function waitingRoom(ws) {
     return (
         !start ? {
             tag: "div",
+            attrs: {
+                class: 'container'
+            },
             children: [
                 {
                     tag: "div",
                     attrs: {
                         class: "timer-container",
                     },
-                    children: [timer]
+                    children: [timer, nb],
                 },
                 Chat(chat, ws, start)
-            ]
+            ],
         } : {
             tag: "div",
             children: [

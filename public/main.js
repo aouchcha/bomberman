@@ -1,4 +1,5 @@
 // Frontend controller: HTTP + WS logic
+// import { Children } from "react";
 import { useState } from "./Apex/core.js";
 import { waitingRoom } from "./render.js";
 
@@ -47,18 +48,31 @@ export function renderApp() {
 
     return (
         wait ? {
-            tag: "input",
+            tag: "div",
             attrs: {
-                type: "text",
-                value: username,
-                placeholder: "Enter username",
-                autofocus: 'autofocus',
-                // style: wait ? "display:flex" : "display:none",
-                oninput: (e) => {
-                    setUsername(e.target.value)
+                class: 'username-container'
+            },
+            children: [
+                {
+                    tag: "h2",
+                    children: ["Welcome!"],
                 },
-                onkeydown: async (e) => await checkUserName(e)
-            }
+                {
+                    tag: "input",
+                    attrs: {
+                        type: "text",
+                        name: "username",
+                        value: username,
+                        placeholder: "Enter username",
+                        autofocus: 'autofocus',
+                        // style: wait ? "display:flex" : "display:none",
+                        oninput: (e) => {
+                            setUsername(e.target.value)
+                        },
+                        onkeydown: async (e) => await checkUserName(e)
+                    }
+                }
+            ]
         } : waitingRoom(ws)
     )
 }

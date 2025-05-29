@@ -2,12 +2,13 @@ import { useState } from "./Apex/core.js";
 
 export function Chat(chat, ws, start) {
     const [msg, setMsg] = useState("");
-    function sendMessage() {
+    function sendMessage(e) {
         if (msg && msg.trim() != "") {
             ws.send(JSON.stringify({
                 type: 'chat',
                 message: msg,
             }));
+            e.target.value = ''
             setMsg("");
         }
     }
@@ -67,7 +68,11 @@ export function Chat(chat, ws, start) {
                                     e.target.style.background = '#4CAF50';
                                     e.target.style.transform = 'scale(1)';
                                 },
-                                onclick: sendMessage
+                                onclick: (e) => {
+                                    console.log("clicked send")
+                                    sendMessage(e);
+                                    setMsg('')
+                                }
                             },
                             children: ["SEND"]
                         }

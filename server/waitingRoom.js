@@ -1,8 +1,8 @@
 import { tile } from "./game/tile.js";
 import { createPlayer } from "./utils.js";
 
-const waitTimer = 4;
-const readyTimer = 1;
+const waitTimer = 2;
+const readyTimer = 2;
 
 export class WaitingRoom {
     constructor() {
@@ -14,7 +14,7 @@ export class WaitingRoom {
     }
 
     addPlayer(player) {
-        if (this.players.size == 2 && this.status == 'waiting') {
+        if (this.players.size >= 2 && this.status == 'waiting') {
             this.startTimer();
         }
 
@@ -30,11 +30,11 @@ export class WaitingRoom {
         // console.log("playerId ===>", playerId)
         const username = [...this.players.keys()].find(key => this.players.get(key) === playerId.xx);
         console.log("pid ==> ", username)
-        const removedPlayer = this.players.get(username);
+        //const removedPlayer = this.players.get(username);
         // console.log("removedPlayer ===>", removedPlayer.socket)
         // const username = playerId.get()
         this.players.delete(username);
-        console.log(`Player ${username} removed from the waiting room.`);
+        //console.log(`Player ${username} removed from the waiting room.`);
         if (this.players.size < 2) {
             if (this.timer) {
                 clearInterval(this.timer);
@@ -46,9 +46,10 @@ export class WaitingRoom {
                 type: 'timer',
                 status: "waiting",
                 time: this.timerDuration,
+                playersNumber: this.players.size
             });
         }
-        console.log("players in remove player ====>", this.players.size)
+        //console.log("players in remove player ====>", this.players.size)
     }
 
     broadcast(message) {
@@ -72,6 +73,7 @@ export class WaitingRoom {
                 type: 'timer',
                 time: this.timerDuration,
                 status: this.status,
+                playersNumber: this.players.size
             });
 
             this.timerDuration--;
@@ -85,6 +87,7 @@ export class WaitingRoom {
     }
 
     startPostCountdown() {
+        //this is the second countDown to start the game 
         if (this.timer) {
             clearInterval(this.timer);
             this.timer = null;
@@ -98,6 +101,8 @@ export class WaitingRoom {
                 type: 'postCountdown',
                 time: this.timerDuration,
                 status: this.status,
+                // usernames: [...this.players.keys()],
+                playersNumber: this.players.size
             });
 
             this.timerDuration--;
@@ -125,7 +130,7 @@ export class WaitingRoom {
         // console.log("grid jdida !!!!")
         this.status = 'grid';
         // console.log({hh:tile.board[1]});
-        
+
         //console.log(`onGameStart ====> size = ${this.players.size} , `, [...this.players.keys()])
         this.broadcast({
             type: "grid",
