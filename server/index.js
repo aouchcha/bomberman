@@ -210,7 +210,7 @@ wss.on("connection", (ws, req) => {
                         myplayer: data.myplayer
                     }));
                 }
-            }, 5000);
+            }, 1000);
         } else if (data.type === "test") {
             // console.log(data.myplayer);
 
