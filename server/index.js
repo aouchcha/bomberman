@@ -110,14 +110,47 @@ wss.on("connection", (ws, req) => {
 
         let movingPlayer = {};
         if (data.type == "move") {
-            let { position, players } = updatePosition(data.direction, data.position, data.username, data.myplayer, data.players)
+            // console.log(data);
+            
+            let { position, players, myplayer } = updatePosition(data.direction, data.position, data.username, data.myplayer, data.players)
             movingPlayer = data
+
+            // console.log({position, players});
+
+            for (let i = 0; i < grid.length; i++) {
+                for (let j = 0; j < grid[i].length; j++) {
+                    if (grid[i][j] !== "brick" && grid[i][j] !== "wall" && !grid[i][j].includes("bomb") && !powerUps.has(`${i},${j}`)) {
+                        grid[i][j] = "path";
+                    }
+                }
+            }
+            players.forEach(pl => {
+
+                grid[pl.position.x][pl.position.y] = pl.id;
+            });
+
+            // SuperPowers.forEach((pos) => {
+            //     trySpawnPowerUp(pos)
+            // })
+
+            // powerUps.forEach((key, value) => {
+            //     console.log({ key, value });
+            //     console.log(typeof value);
+
+            //     const coords = value.split(',')
+            //     console.log(coords);
+
+            //     grid[parseInt(coords[0])][parseInt(coords[1])] = key
+            // })
+            // console.log(movingPlayer.direction);
+
             ws.send(JSON.stringify({
                 type: "self-update",
                 id: movingPlayer.username,
                 direction: movingPlayer.direction,
                 grid: grid,
                 players: players,
+                myplayer: myplayer,
                 position: position
             }));
             for (const [key, value] of waitingRoom.players.entries()) {
@@ -249,66 +282,118 @@ wss.on("connection", (ws, req) => {
             // }
 
             // Update player positions
-            data.players.forEach(pl => {
-                if (data.bombCorrds.x + 1 == pl.position.x && data.bombCorrds.y == pl.position.y ||
-                    data.bombCorrds.x - 1 == pl.position.x && data.bombCorrds.y == pl.position.y ||
-                    data.bombCorrds.x == pl.position.x && data.bombCorrds.y + 1 == pl.position.y ||
-                    data.bombCorrds.x == pl.position.x && data.bombCorrds.y - 1 == pl.position.y ||
-                    data.bombCorrds.x == pl.position.x && data.bombCorrds.y == pl.position.y
-                ) {
-                    pl.lives--;
-                    if (pl.lives > 0) {
-                        grid[pl.position.x][pl.position.y] = pl.id
-                    }
-                } else if (pl.lives > 0) {
-                    grid[pl.position.x][pl.position.y] = pl.id;
-                }
+            // console.log({x:data.bombCorrds.x + range, y:data.bombCorrds.y});
+            // console.log({x :data.bombCorrds.x - range, y: data.bombCorrds.y});
+            // console.log({x: data.bombCorrds.x, y: data.bombCorrds.y + range});
+            // console.log({x: data.bombCorrds.x, y: data.bombCorrds.y - range});
 
+            data.players.forEach(pl => {
+                // if (data.bombCorrds.x + range >= pl.position.x && data.bombCorrds.y == pl.position.y ||
+                //     data.bombCorrds.x - range <= pl.position.x && data.bombCorrds.y == pl.position.y ||
+                //     data.bombCorrds.x == pl.position.x && data.bombCorrds.y + range >= pl.position.y ||
+                //     data.bombCorrds.x == pl.position.x && data.bombCorrds.y - range <= pl.position.y ||
+                //     data.bombCorrds.x == pl.position.x && data.bombCorrds.y == pl.position.y
+                // ) {
+                //     // console.log();
+
+                //     // console.log("wiw", pl.id ,pl.lives);
+
+                //     pl.lives--;
+                //     if (pl.lives > 0) {
+                //         grid[pl.position.x][pl.position.y] = pl.id
+                //     }
+                // } else if (pl.lives > 0) {
+                //     grid[pl.position.x][pl.position.y] = pl.id;
+                // }
+                directions.forEach(pos => {
+
+                    // Only affect positions within grid bounds
+                    if (pos.x < tile.height && pos.x > 0 && pos.y < tile.width && pos.y > 0) {
+                        // console.log(grid[pos.x][pos.y]);
+                        // if (grid[pos.x][pos.y] === "brick" || grid[pos.x][pos.y] === "path") {
+                        //     if (grid[pos.x][pos.y] === "brick") {
+                        //         // console.log({ x: pos.x, y: pos.y });
+                        //         const types = [POWERUP_TYPES.SPEED, POWERUP_TYPES.RANGE, POWERUP_TYPES.EXTRABOMB];
+                        //         const type = types[Math.floor(Math.random() * types.length)];
+                        //         powerUps.set(`${pos.x},${pos.y}`, type);
+                        //         // SuperPowers.push({ x: pos.x, y: pos.y })
+                        //     }
+                        //     grid[pos.x][pos.y] = 'collision';
+                        //     // trySpawnPowerUp(pos);
+                        // }
+                        if (pl.position.x == pos.x && pl.position.y == pos.y) {
+                            pl.lives--;
+                            return
+                        }
+                    }
+                })
+                if (pl.lives > 0) {
+                    grid[pl.position.x][pl.position.y] = pl.id
+                }
             });
 
 
             for (const [key, value] of waitingRoom.players.entries()) {
                 value.send(JSON.stringify({
-                    type: "newgrid1",
+                    type: "expo",
                     grid: grid,
-                    // players: data.players,
+                    players: data.players,
                 }));
             }
 
             setTimeout(() => {
-                for (let i = 0; i < grid.length; i++) {
-                    for (let j = 0; j < grid[i].length; j++) {
-                        if (grid[i][j] !== "brick" && grid[i][j] !== "wall" && !grid[i][j].includes("bomb") && !powerUps.has(`${i},${j}`)) {
-                            grid[i][j] = "path";
-                        }
-                    }
-                }
-                data.players.forEach(pl => {
-                    grid[pl.position.x][pl.position.y] = pl.id;
-                });
-
-                // SuperPowers.forEach((pos) => {
-                //     trySpawnPowerUp(pos)
-                // })
-
-                powerUps.forEach((key, value) => {
-                    console.log({ key, value });
-                    console.log(typeof value);
-
-                    const coords = value.split(',')
-                    console.log(coords);
-
-                    grid[parseInt(coords[0])][parseInt(coords[1])] = key
-                })
-
                 for (const [key, value] of waitingRoom.players.entries()) {
                     value.send(JSON.stringify({
-                        type: "newgrid2",
-                        grid: grid,
-                        players: data.players,
+                        type: "after_expo1",
                     }));
                 }
             }, 1000);
+        } else if (data.type == "after_expo2") {
+            for (let i = 0; i < grid.length; i++) {
+                for (let j = 0; j < grid[i].length; j++) {
+                    if (grid[i][j] !== "brick" && grid[i][j] !== "wall" && !grid[i][j].includes("bomb") && !powerUps.has(`${i},${j}`)) {
+                        grid[i][j] = "path";
+                    }
+                }
+            }
+            data.players.forEach(pl => {
+                grid[pl.position.x][pl.position.y] = pl.id;
+            });
+            // console.log(waitingRoom.players.get(data.myplayer.id).sender);
+
+            // SuperPowers.forEach((pos) => {
+            //     trySpawnPowerUp(pos)
+            // })
+            // console.log(data.players.length);
+            // console.log(waitingRoom.players.size);
+
+            // console.log(powerUps.size);
+
+            powerUps.forEach((key, value) => {
+                // console.log({ key, value });
+                // console.log(typeof value);
+
+                const coords = value.split(',')
+                // console.log(coords);
+
+                grid[parseInt(coords[0])][parseInt(coords[1])] = key
+            })
+
+            for (const [key, value] of waitingRoom.players.entries()) {
+                value.send(JSON.stringify({
+                    type: "newgrid",
+                    grid: grid,
+                    players: data.players,
+                }));
+            }
+        } else if (data.type == "powerUpCollected") {
+            for (const [key, value] of waitingRoom.players.entries()) {
+                value.send(JSON.stringify({
+                    type: "powerUpCollected2",
+                    grid: grid,
+                    players: data.players,
+                }));
+            }
         }
     })
 
@@ -330,6 +415,8 @@ wss.on("connection", (ws, req) => {
                     }
                 }
             }
+
+            powerUps.clear();
             once = true;
 
             // console.log("game ended!!!!!!!!!!!!");
@@ -352,9 +439,10 @@ wss.on("connection", (ws, req) => {
 })
 
 function updatePosition(direction, position, username, myplayer, players) {
-    console.log(Obstacles(position, direction));
+    let isSuperPower = false;
+    // console.log(Obstacles(position, direction));
 
-    if (Obstacles(position, direction)) {
+    if (Obstacles(position, direction, myplayer)) {
         if (direction === 'up') {
             position.x -= 1
         } else if (direction === 'down') {
@@ -365,11 +453,18 @@ function updatePosition(direction, position, username, myplayer, players) {
             position.y += 1
         }
     }
-    console.log(position);
+    players.forEach((pl) => {
+        if (pl.id == myplayer.id) {
+            pl.position = position
+            pl.direction = direction
+        }
+    })
+    // console.log(position);
 
     // Check if player moved to a power-up position
     const powerUpKey = `${position.x},${position.y}`;
     if (powerUps.has(powerUpKey)) {
+        isSuperPower = true;
         const powerUpType = powerUps.get(powerUpKey);
         // console.log(players);
         // console.log(myplayer);
@@ -384,36 +479,41 @@ function updatePosition(direction, position, username, myplayer, players) {
                         p.range += 1;
                     }
                 })
+                // myplayer.range += 1;
                 break;
             case 'speed':
-                // players.forEach((p) => {
-                //     if (p.id == myplayer.id && p.range < 4) {
-                //         console.log("hanni");
+                players.forEach((p) => {
+                    if (p.id == myplayer.id && p.speed > 100) {
+                        console.log("hanni f speed");
 
-                //         grid[position.x][position.y] = "path";
-                //         p.range += 1;
-                //     }
-                // })
+                        grid[position.x][position.y] = "path";
+                        p.speed -= 50;
+                    }
+                })
+                // myplayer.speed -= 50;
+
                 break;
         }
         // console.log({key:powerUpKey, type:powerUpType});
-
+        
         powerUps.delete(powerUpKey);
         setTimeout(() => {
             for (const [_, value] of waitingRoom.players.entries()) {
                 value.send(JSON.stringify({
                     type: "powerUpCollected",
-                    grid: grid,
-                    position: position,
-                    powerUpType: powerUpType,
-                    playerId: username,
+                    // grid: grid,
+                    // position: position,
+                    // powerUpType: powerUpType,
+                    // playerId: username,
                     players: players
                 }));
             }
-        }, 1000);
+        }, 10);
+        // console.log({myplayer});
+
 
     }
-    return { position, players }
+    return { position, players, myplayer }
 }
 
 function trySpawnPowerUp(position) {
@@ -433,7 +533,9 @@ function trySpawnPowerUp(position) {
     // }
 }
 
-function Obstacles(position, direction) {
+function Obstacles(position, direction, myplayer) {
+    // console.log({myplayer});
+    
     if (started) {
         checkSomething(grid);
         started = false;
@@ -441,7 +543,7 @@ function Obstacles(position, direction) {
     const nextX = position.y + (direction === 'right' ? 1 : direction === 'left' ? -1 : 0);
     const nextY = position.x + (direction === 'down' ? 1 : direction === 'up' ? -1 : 0);
 
-    if (grid[nextY] && grid[nextY][nextX] == "bomb" || grid[nextY][nextX] == "wall" || grid[nextY][nextX] == "brick") {
+    if (grid[nextY] && grid[nextX] && grid[nextY][nextX] == "bomb" || grid[nextY][nextX] == "wall" || grid[nextY][nextX] == "brick" || grid[nextY][nextX].includes("bomb")) {
         // console.log(grid[nextX][nextY]);
 
         return false;
