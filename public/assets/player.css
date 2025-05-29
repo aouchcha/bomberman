@@ -2,23 +2,26 @@
    --pixel-size: 4;
    --steps: 3;
    --character-move: -30%;
+   --ani: 200
 }
 
 
 
 .Character {
+    will-change: transform, left, top;
    height: 50px;
    width: 50px;
    overflow: hidden;
    position: absolute;
-   will-change: transform;
+   /* will-change: transform; */
    z-index: 3;
    top: 0px;
    left: 0px;
+   
 }
 
 .Character_spritesheet {
-   animation: moveSpritesheet 0.6s steps(var(--steps)) infinite;
+   animation: moveSpritesheet 1s steps(var(--steps)) infinite;
    width: calc(120px * var(--pixel-size));
    position: absolute;
 }

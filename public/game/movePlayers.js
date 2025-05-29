@@ -48,17 +48,17 @@ function movingPlayerAnimation(direction) {
     }
 }
 
-function updatingPlayer(newPlayer) {
-    if (players.length > 0) {
-        players.forEach(player => {
-            if (player.id == localStorage.getItem("player")) {
-                // player.direction = direction;
-                // player.bombRange = player.bombRange || 1; // Initialize bomb range
-                player = newPlayer;
-            }
-        });
-    }
-}
+// function updatingPlayer(newPlayer) {
+//     if (players.length > 0) {
+//         players.forEach(player => {
+//             if (player.id == localStorage.getItem("player")) {
+//                 // player.direction = direction;
+//                 // player.bombRange = player.bombRange || 1; // Initialize bomb range
+//                 player = newPlayer;
+//             }
+//         });
+//     }
+// }
 
 export function movePlayer(ws, updatePlayerState, setMap) {
     ws.onmessage = (event) => {
@@ -71,20 +71,30 @@ export function movePlayer(ws, updatePlayerState, setMap) {
             return;
         }
         if (data.type === "mouvement") {
+            console.log({players: data.players});
+            
             players.forEach(player => {
                 if (player.id == data.id) {
                     player.position = data.position;
                     player.direction = data.direction;
                 }
-                updatePlayerState(player)
+                updatePlayerState(data.players)
 
             });
-        } else if (data.type === "self-update") {
+            ResetPlayers(data.players);
+            // setMap(data.grid);
+        }
+        else if (data.type === "self-update") {
             myPlayer.position = data.position;
             myPlayer.direction = data.direction;
-            updatePlayerState(myPlayer)
-        } else if (data.type === "bombPlaced") {
-            console.log({ grid: data.grid });
+            console.log(data.myplayer);
+            
+            updatePlayerState(data.myplayer)
+            ResetPlayers(data.players);
+            // setMap(data.grid);
+        }
+        else if (data.type === "bombPlaced") {
+            // console.log({ grid: data.grid });
             setMap(data.grid)
         }
         else if (data.type === "bombExploded") {
@@ -95,32 +105,48 @@ export function movePlayer(ws, updatePlayerState, setMap) {
                 bombCorrds: data.position,
                 myplayer: data.myplayer,
             }));
-        }else if (data.type == "newgrid1") {
-            setMap(data.grid);
-        } else if (data.type === "newgrid2") {
-            console.log("new grid ==>", data.grid)
+        } else if (data.type == "expo") {
             ResetPlayers(data.players);
+            updatePlayerState(data.myplayer)
             setMap(data.grid);
-        }
-        else if (data.type === "powerUpCollected") {
+        } else if (data.type === "after_expo1") {
+            movingPlayerAnimation(' ', ' ', directions.keySpace);
+            ws.send(JSON.stringify({
+                type: 'after_expo2',
+                players: players,
+                myplayer: myPlayer
+            }));
+
+        } else if (data.type === "newgrid") {
+            // console.log("new grid ==>", data.grid)
             ResetPlayers(data.players);
             updatePlayerState(data.myplayer)
             setMap(data.grid);
         }
+        else if (data.type === "powerUpCollected") {
+            ws.send(JSON.stringify({
+                type: 'powerUpCollected',
+                players: players,
+                myplayer: myPlayer
+            }));
+            ResetPlayers(data.players);
+            // updatePlayerState(data.myplayer)
+            // setMap(data.grid);
+        }
+        else if (data.type === "powerUpCollected2") {
+            // ws.send(JSON.stringify({
+            //     type: 'powerUpCollected',
+            //     players: players,
+            //     myplayer: myPlayer
+            // }));
+            console.log({PP:data.players});
+            
+            ResetPlayers(data.players);
+            // updatePlayerState(data.myplayer)
+            setMap(data.grid);
+        }
     }
-    const bombing = throttle(function () {
-        movingPlayerAnimation(' ', ' ', directions.keySpace);
-        ws.send(JSON.stringify({
-            type: 'bombPlaced',
-            bomb: true,
-            position: myPlayer.position,
-            lastKey: 'Space',
-            username: myPlayer.id,
-            players: players,
-            myplayer: myPlayer,
 
-        }));
-    }, 5000)
 
     document.onkeydown = (event) => {
         switch (event.key) {
@@ -173,11 +199,25 @@ export function movePlayer(ws, updatePlayerState, setMap) {
                 }));
                 break;
             case ' ':
-                bombing()
+                bombing(ws)
                 break;
         }
     };
 }
+
+const bombing = throttle(function (ws) {
+    movingPlayerAnimation(' ', ' ', directions.keySpace);
+    ws.send(JSON.stringify({
+        type: 'bombPlaced',
+        bomb: true,
+        position: myPlayer.position,
+        lastKey: 'Space',
+        username: myPlayer.id,
+        players: players,
+        myplayer: myPlayer,
+
+    }));
+}, 5000)
 
 export function throttle(func, delay) {
     let isWaiting = false;

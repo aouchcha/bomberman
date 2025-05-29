@@ -5,38 +5,40 @@ import { render } from "../Apex/dom.js";
 export let players = [];
 export let bombs = []
 let i = 0
-const sizes = {
-    width: 50,
-    height: 50,
-}
+// const sizes = {
+//     width: 50,
+//     height: 50,
+// }
 
-export function FilterBombs() {
-    bombs = bombs.filter(bomb =>
-        bomb.x !== data.position.x || bomb.y !== data.position.y
-    );
-}
+// export function FilterBombs() {
+//     bombs = bombs.filter(bomb =>
+//         bomb.x !== data.position.x || bomb.y !== data.position.y
+//     );
+// }
 
-export function AddBomb(bomb) {
-    bombs.push(bomb)
-}
+// export function AddBomb(bomb) {
+//     bombs.push(bomb)
+// }
 
 export function ResetPlayers(ps) {
     players = ps.filter((pl) => {
         return pl.lives > 0
     })
-    console.log({ players });
+    // console.log({ players });
 
 }
 
 export function ResetPlayers2(ps, username) {
-    console.log("ps", ps);
-    console.log("username", username)
+    // console.log("ps", ps);
+    // console.log("username", username)
     players = ps.filter((pl) => {
         return pl.id == username;
     })
 }
 export function gameRoom(tile, ws, setMap) {
-    console.log("new map ===>", tile);
+    // console.log("new map ===>", tile);
+    // console.log({ players });
+
     const [gameState, setGameState] = useState({
         players: [],
         bombs: [],
@@ -58,6 +60,7 @@ export function gameRoom(tile, ws, setMap) {
             players: updatedPlayer,
         }));
     };
+    let x = 0
 
     // Initialize players from tile map
     if (tile && players.length === 0) {
@@ -71,8 +74,8 @@ export function gameRoom(tile, ws, setMap) {
 
                         // Check if this player doesn't exist in our state yet
                         if (!players.find(p => p.username === square)) {
-
-                            // Add new player to state
+                            x++
+                            // Add new       player to state
                             const newPlayer = {
                                 position: {
                                     x: i,
@@ -85,7 +88,8 @@ export function gameRoom(tile, ws, setMap) {
                                 id: square,
                                 direction: "down",
                                 lives: 3,
-                                range: 1
+                                range: 1,
+                                speed: 200,
                             };
                             players.push(newPlayer);
 
@@ -108,6 +112,7 @@ export function gameRoom(tile, ws, setMap) {
         });
 
     }
+    console.log(x);
     movePlayer(ws, updatePlayerState, setMap, setGameState)
 
     return {
@@ -245,7 +250,7 @@ export function gameRoom(tile, ws, setMap) {
                             }
                         } else {
                             const slice = square.split("-");
-                            console.log(slice.length);
+                            // console.log(slice.length);
                             if (slice.length == 2) {
                                 const player = players.find(p => p.id === slice[1]);
                                 if (player) {
@@ -286,15 +291,23 @@ export function gameRoom(tile, ws, setMap) {
     };
 }
 
+let first = true;
 
 export function createPlayer(player) {
-
+    // let x = player.position.x;
+    // let y = player.position.y;
+    // if (first) {
+    //     first = false;
+    //     x = 5;
+    //     y = 5; 
+    // }
     return {
         tag: "div",
         attrs: {
             class: "Character",
             // id: player.id,
-            style: `position: absolute; top: ${player.position.x * 50}px; left: ${player.position.y * 50}px;`,
+            style: `top: ${player.position.x * 50}px; left: ${player.position.y * 50}px;
+            transition: left ${player.speed}ms ease-out, top ${player.speed}ms ease-out;`,
         },
         children: [
             {
