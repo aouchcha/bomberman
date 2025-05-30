@@ -11,6 +11,7 @@ export function renderApp() {
 
 
     async function checkUserName(e) {
+        if (username.trim().length == 0) return 
         if (e.key == 'Enter') {
             const response = await fetch("/join", {
                 method: 'POST',
@@ -31,10 +32,10 @@ export function renderApp() {
                 };
                 ws.onclose = () => (
                     console.log("ws close"),
-                    localStorage.removeItem("player"),
-                    setTimeout(() => {
-                        window.location.reload()
-                    }, 5000)
+                    localStorage.removeItem("player")
+                    // setTimeout(() => {
+                    //     window.location.reload()
+                    // }, 5000)
                 )
                 setWait(false);
             } else {
@@ -59,6 +60,6 @@ export function renderApp() {
                 },
                 onkeydown: async (e) => await checkUserName(e)
             }
-        } : waitingRoom(ws)
+        } : waitingRoom(ws, setWait)
     )
 }

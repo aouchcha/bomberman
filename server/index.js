@@ -19,8 +19,8 @@ const POWERUP_TYPES = {
     EXTRABOMB: 'ExtraBomb'
 };
 
-const POWERUP_CHANCE = 1;
-const SuperPowers = [];
+// const POWERUP_CHANCE = 1;
+// const SuperPowers = [];
 let powerUps = new Map();
 
 const server = http.createServer((req, res) => {
@@ -71,7 +71,7 @@ const wss = new WebSocketServer({ server });
 let once = true;
 let grid;
 let started = false;
-let isWin = false;
+// let isWin = false;
 wss.on("connection", (ws, req) => {
     const url = new URL(req.url, `http://${req.headers.host}`);
     const username = url.searchParams.get('username')
@@ -82,15 +82,15 @@ wss.on("connection", (ws, req) => {
         once = false;
     }
 
-    const player = {
-        username,
-        xx: {
-            socket: ws,
-            send: (message) => ws.send(message)
-        },
-    }
+    // const player = {
+    //     username,
+    //     xx: {
+    //         socket: ws,
+    //         send: (message) => ws.send(message)
+    //     },
+    // }
     // console.log("player ===> ", player)
-    waitingRoom.addPlayer(player);
+    waitingRoom.addPlayer({username:username, soket:ws});
     if (waitingRoom.players.size >= 2 && waitingRoom.status === "waiting") {
         waitingRoom.startTimer();
     }
@@ -322,13 +322,20 @@ wss.on("connection", (ws, req) => {
                         //     // trySpawnPowerUp(pos);
                         // }
                         if (pl.position.x == pos.x && pl.position.y == pos.y) {
+                            
                             pl.lives--;
-                            return
+                            data.myplayer = pl
+                            // console.log(pl.lives);
+                            
                         }
                     }
                 })
                 if (pl.lives > 0) {
                     grid[pl.position.x][pl.position.y] = pl.id
+                }else {
+                    // console.log("hanni alkhra");
+                    
+                    grid[pl.position.x][pl.position.y] = "path"
                 }
             });
 
@@ -338,6 +345,7 @@ wss.on("connection", (ws, req) => {
                     type: "expo",
                     grid: grid,
                     players: data.players,
+                    myplayer: data.myplayer
                 }));
             }
 
@@ -384,6 +392,7 @@ wss.on("connection", (ws, req) => {
                     type: "newgrid",
                     grid: grid,
                     players: data.players,
+                    myplayer: data.myplayer
                 }));
             }
         } else if (data.type == "powerUpCollected") {
@@ -394,20 +403,42 @@ wss.on("connection", (ws, req) => {
                     players: data.players,
                 }));
             }
+        }else if (data.type == "lose") {
+             for (const [key, value] of waitingRoom.players.entries()) {
+                if (key === data.myplayer.id) {
+                    value.send(JSON.stringify({
+                        type: "lose",
+                    }));
+                }
+            }
+        }else if (data.type == "win") {
+             for (const [key, value] of waitingRoom.players.entries()) {
+                if (key === data.myplayer.id) {
+                    value.send(JSON.stringify({
+                        type: "win",
+                    }));
+                }
+            }
         }
     })
 
     ws.on("close", () => {
-
-        waitingRoom.removePlayer(player);
+        let userid;
+         for (const [key, value] of waitingRoom.players.entries()) {
+                if (value === ws) {
+                    userid = key
+                }
+            }
+        waitingRoom.removePlayer(userid);
         playersUsernames.delete(username);
         setLength.len = playersUsernames.size;
-
+            console.log(waitingRoom.players.size);
+            
         // console.log(`player ==================> `, playersUsernames);
         // console.log(`player ==========> `, waitingRoom.players.size);
         // console.log(`Started ==========> `, started);
         if (waitingRoom.players.size === 1) {
-
+            waitingRoom.players.clear();
             for (let i = 0; i < grid.length; i++) {
                 for (let j = 0; j < grid[i].length; j++) {
                     if (grid[i][j] !== "wall") {
@@ -418,18 +449,19 @@ wss.on("connection", (ws, req) => {
 
             powerUps.clear();
             once = true;
+            started = false;
 
-            // console.log("game ended!!!!!!!!!!!!");
+            console.log("game ended!!!!!!!!!!!!");
 
-            for (const [key, value] of waitingRoom.players.entries()) {
-                //console.log("OVEEEEEEEEEEEEEEEEEEEEEEEEEEEER wlad L9hab");
-                value.send(JSON.stringify({
-                    type: "xxx",
-                    message: "Game Over",
-                    username: key,
-                }));
+        //     for (const [key, value] of waitingRoom.players.entries()) {
+        //         //console.log("OVEEEEEEEEEEEEEEEEEEEEEEEEEEEER wlad L9hab");
+        //         value.send(JSON.stringify({
+        //             type: "xxx",
+        //             message: "Game Over",
+        //             username: key,
+        //         }));
 
-            }
+        //     }
         }
     })
     // console.log(`Started after close ==========> `, started);
@@ -493,6 +525,15 @@ function updatePosition(direction, position, username, myplayer, players) {
                 // myplayer.speed -= 50;
 
                 break;
+            case 'ExtraBomb':
+                 players.forEach((p) => {
+                    if (p.id == myplayer.id && p.bombs > 0) {
+                        console.log("hanni f speed");
+
+                        grid[position.x][position.y] = "path";
+                        p.bombs -= 1;
+                    }
+                })
         }
         // console.log({key:powerUpKey, type:powerUpType});
         
@@ -508,7 +549,7 @@ function updatePosition(direction, position, username, myplayer, players) {
                     players: players
                 }));
             }
-        }, 10);
+        }, 100);
         // console.log({myplayer});
 
 

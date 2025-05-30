@@ -1,17 +1,17 @@
-import { players, ResetPlayers, ResetPlayers2 } from "./gameRoom.js";
+import { players, updatePlayers, ResetPlayers } from "./gameRoom.js";
 import { render } from "../Apex/dom.js";
 
-const POWERUP_CHANCE = 0.5;
-const speed = 5;
-let lastKey;
+// const POWERUP_CHANCE = 0.5;
+// const speed = 5;
+// let lastKey;
 let myPlayer;
 
 // At the top with other constants
-const POWERUP_TYPES = {
-    SPEED: 'speed',
-    RANGE: 'range',
-    EXTRABOMB: 'ExtraBomb'
-};
+// const POWERUP_TYPES = {
+//     SPEED: 'speed',
+//     RANGE: 'range',
+//     EXTRABOMB: 'ExtraBomb'
+// };
 const directions = {
     keyUp: "up",
     keyDown: "down",
@@ -20,29 +20,34 @@ const directions = {
     keySpace: "space"
 }
 
-const keys = {
-    w: {
-        pressed: false
-    },
-    a: {
-        pressed: false
-    },
-    s: {
-        pressed: false
-    },
-    d: {
-        pressed: false
-    }
-}
+// const keys = {
+//     w: {
+//         pressed: false
+//     },
+//     a: {
+//         pressed: false
+//     },
+//     s: {
+//         pressed: false
+//     },
+//     d: {
+//         pressed: false
+//     }
+// }
 
 // let playerElement
-function movingPlayerAnimation(direction) {
+function movingPlayerAnimation() {
     if (players.length > 0) {
         players.forEach(player => {
             if (player.id == localStorage.getItem("player")) {
                 // player.direction = direction;
                 // player.bombRange = player.bombRange || 1; // Initialize bomb range
                 myPlayer = player;
+                // console.log(player);
+                
+                Time_Between_Bombs = player.bombs
+                // console.log({ Time_Between_Bombs });
+
             }
         });
     }
@@ -60,19 +65,19 @@ function movingPlayerAnimation(direction) {
 //     }
 // }
 
-export function movePlayer(ws, updatePlayerState, setMap) {
+export function movePlayer(ws, updatePlayerState, setMap, setGameover, setWinner) {
     ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
         if (data.type == "xxx") {
             console.log("l7wa");
 
-            ResetPlayers2(players, data.username)
-            updatePlayerState(players)
+            // ResetPlayers2(players, data.username)
+            // updatePlayerState(players)
             return;
         }
         if (data.type === "mouvement") {
-            console.log({players: data.players});
-            
+            // console.log({ players: data.players });
+
             players.forEach(player => {
                 if (player.id == data.id) {
                     player.position = data.position;
@@ -81,16 +86,16 @@ export function movePlayer(ws, updatePlayerState, setMap) {
                 updatePlayerState(data.players)
 
             });
-            ResetPlayers(data.players);
+            updatePlayers(data.players);
             // setMap(data.grid);
         }
         else if (data.type === "self-update") {
             myPlayer.position = data.position;
             myPlayer.direction = data.direction;
-            console.log(data.myplayer);
-            
+            // console.log(data.myplayer);
+
             updatePlayerState(data.myplayer)
-            ResetPlayers(data.players);
+            updatePlayers(data.players);
             // setMap(data.grid);
         }
         else if (data.type === "bombPlaced") {
@@ -106,8 +111,33 @@ export function movePlayer(ws, updatePlayerState, setMap) {
                 myplayer: data.myplayer,
             }));
         } else if (data.type == "expo") {
-            ResetPlayers(data.players);
-            updatePlayerState(data.myplayer)
+            // console.log("new grid ==>", data.grid)
+            // console.log({DP: data.myplayer});
+            // console.log({myPlayer});
+            
+            // if (data.myplayer)
+            updatePlayers(data.players);
+            movingPlayerAnimation()
+            console.log({ALL:data.players});
+            
+            console.log({Me:myPlayer});
+
+            if (myPlayer.lives == 0) {
+                ws.send(JSON.stringify({
+                    type: "lose",
+                    myplayer: myPlayer
+                }))
+                
+                // ws.close();
+            }
+            ResetPlayers(data.players)
+            if (players.length == 1) {
+                ws.send(JSON.stringify({
+                    type: "win",
+                    myplayer: myPlayer
+                }))
+            }
+            // updatePlayerState(data.myplayer)
             setMap(data.grid);
         } else if (data.type === "after_expo1") {
             movingPlayerAnimation(' ', ' ', directions.keySpace);
@@ -118,9 +148,11 @@ export function movePlayer(ws, updatePlayerState, setMap) {
             }));
 
         } else if (data.type === "newgrid") {
-            // console.log("new grid ==>", data.grid)
-            ResetPlayers(data.players);
-            updatePlayerState(data.myplayer)
+           
+            
+           
+            updatePlayers(data.players);
+            // updatePlayerState(data.myplayer)
             setMap(data.grid);
         }
         else if (data.type === "powerUpCollected") {
@@ -129,7 +161,7 @@ export function movePlayer(ws, updatePlayerState, setMap) {
                 players: players,
                 myplayer: myPlayer
             }));
-            ResetPlayers(data.players);
+            updatePlayers(data.players);
             // updatePlayerState(data.myplayer)
             // setMap(data.grid);
         }
@@ -139,11 +171,23 @@ export function movePlayer(ws, updatePlayerState, setMap) {
             //     players: players,
             //     myplayer: myPlayer
             // }));
-            console.log({PP:data.players});
+            // console.log();
             
-            ResetPlayers(data.players);
+            console.log({ PP: data.players });
+
+            updatePlayers(data.players);
             // updatePlayerState(data.myplayer)
             setMap(data.grid);
+        }else if (data.type == "lose") {
+            ws.close();
+            updatePlayers([])
+            setMap([])
+            setGameover(true)
+        }else if (data.type == "win") {
+            ws.close();
+            updatePlayers([])
+            setMap([])
+            setWinner(true)
         }
     }
 
@@ -199,25 +243,42 @@ export function movePlayer(ws, updatePlayerState, setMap) {
                 }));
                 break;
             case ' ':
-                bombing(ws)
+                movingPlayerAnimation(event.key, event.key, directions.keySpace);
+                console.log({ Time_Between_Bombs });
+
+                bombing(ws, myPlayer)
                 break;
         }
     };
 }
 
-const bombing = throttle(function (ws) {
-    movingPlayerAnimation(' ', ' ', directions.keySpace);
-    ws.send(JSON.stringify({
-        type: 'bombPlaced',
-        bomb: true,
-        position: myPlayer.position,
-        lastKey: 'Space',
-        username: myPlayer.id,
-        players: players,
-        myplayer: myPlayer,
+let lastBombTime = 0;
+let Time_Between_Bombs = 5;
+function bombing(ws, myplayer) {
+   const currentTime = Date.now();
+   const requiredDelay = Time_Between_Bombs * 1000;
+   
+   if (currentTime - lastBombTime >= requiredDelay) {
+      movingPlayerAnimation(' ', ' ', directions.keySpace);
+      
+      if (myplayer) {
+         console.log("hanni", myplayer.bombs);
+         Time_Between_Bombs = myplayer.bombs;
+      }
 
-    }));
-}, 5000)
+      ws.send(JSON.stringify({
+         type: 'bombPlaced',
+         bomb: true,
+         position: myplayer.position,
+         lastKey: 'Space',
+         username: myplayer.id,
+         players: players,
+         myplayer: myplayer,
+      }));
+      
+      lastBombTime = currentTime;
+   }
+}
 
 export function throttle(func, delay) {
     let isWaiting = false;

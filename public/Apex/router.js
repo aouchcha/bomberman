@@ -1,61 +1,37 @@
-const routes = [];
-let currentRoute = null;
-
-/**
- * Add a new route
- * @param {string} path - The route path
- * @param {Function} handler - The route handler function
- */
-function add(path, handler) {
-    const pattern = new RegExp('^' + path.replace(/:[^/]+/g, '([^/]+)') + '$');
-    routes.push({ pattern, handler });
+export let routes = [];
+export function Routes(newroutes) {
+    routes = newroutes
 }
 
-/**
- * Navigate to a new route
- * @param {string} path - The path to navigate to
- */
-function navigate(path) {
+function navigate(path) {    
     window.location.hash = path;
-}
-
-/**
- * Handle route changes
- */
-function handleRouteChange() {
-    const hash = window.location.hash.slice(1) || '/';
-
-    for (const route of routes) {
-        const match = hash.match(route.pattern);
-        if (match) {
-            const params = match.slice(1);
-            currentRoute = { path: hash, params };
-            route.handler(...params);
-            return;
-        }
-    }
-
-    // No route found
-    console.warn(`No route found for path: ${hash}`);
-}
-
-/**
- * Start the router
- */
-function start() {
     handleRouteChange();
 }
 
-/**
- * Get the current route
- * @returns {Object} The current route object
- */
-function getCurrentRoute() {
-    return currentRoute;
+function handleRouteChange() {
+    let Error = true
+    
+    let hash = "#" + window.location.hash.slice(1);
+   
+    for (const route of routes) {
+        if (route.route === hash) {
+            Error = false
+            route.handler1();
+            route.handler2();
+            route.handler3();
+            route.handler4();
+
+            route.Error()
+            return;
+        }
+    }
+    if (Error && routes.length == 2) {
+        routes[routes.length-1].handler()
+    }
 }
 
-// Initialize event listener
-window.addEventListener('#app', handleRouteChange);
+window.onhashchange=handleRouteChange;
+window.onload=navigate('#/')
 
-// Export router functions
-export { add, navigate, start, getCurrentRoute };
+
+export {navigate};

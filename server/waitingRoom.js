@@ -14,12 +14,14 @@ export class WaitingRoom {
     }
 
     addPlayer(player) {
+        console.log({name:player.username});
+        
         if (this.players.size == 2 && this.status == 'waiting') {
             this.startTimer();
         }
 
         // this.players.set(player.username, { socket: player.socket, send: player.send });
-        this.players.set(player.username, player.xx);
+        this.players.set(player.username, player.soket);
 
         if (this.status === 'postCountdown') {
             this.removePlayer(player)
@@ -28,13 +30,13 @@ export class WaitingRoom {
     }
     removePlayer(playerId) {
         // console.log("playerId ===>", playerId)
-        const username = [...this.players.keys()].find(key => this.players.get(key) === playerId.xx);
-        console.log("pid ==> ", username)
-        const removedPlayer = this.players.get(username);
+        // const username = [...this.players.keys()].find(key => this.players.get(key) === playerId.xx);
+        // console.log("pid ==> ", username)
+        // const removedPlayer = this.players.get(username);
         // console.log("removedPlayer ===>", removedPlayer.socket)
         // const username = playerId.get()
-        this.players.delete(username);
-        console.log(`Player ${username} removed from the waiting room.`);
+        this.players.delete(playerId);
+        console.log(`Player ${playerId} removed from the waiting room.`);
         if (this.players.size < 2) {
             if (this.timer) {
                 clearInterval(this.timer);
@@ -53,6 +55,7 @@ export class WaitingRoom {
 
     broadcast(message) {
         const msg = JSON.stringify(message);
+        // console.log( this.players.values());
         for (const player of this.players.values()) {
             player.send(msg);
         }

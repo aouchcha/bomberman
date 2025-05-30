@@ -1,66 +1,44 @@
 import { movePlayer } from "./movePlayers.js";
 import { useState } from "../Apex/core.js";
-import { render } from "../Apex/dom.js";
+import { navigate, Routes } from "../Apex/router.js";
 
 export let players = [];
-export let bombs = []
-let i = 0
-// const sizes = {
-//     width: 50,
-//     height: 50,
-// }
-
-// export function FilterBombs() {
-//     bombs = bombs.filter(bomb =>
-//         bomb.x !== data.position.x || bomb.y !== data.position.y
-//     );
-// }
-
-// export function AddBomb(bomb) {
-//     bombs.push(bomb)
-// }
 
 export function ResetPlayers(ps) {
     players = ps.filter((pl) => {
         return pl.lives > 0
     })
-    // console.log({ players });
-
 }
 
-export function ResetPlayers2(ps, username) {
-    // console.log("ps", ps);
-    // console.log("username", username)
-    players = ps.filter((pl) => {
-        return pl.id == username;
-    })
+export function updatePlayers(ps) {
+    players = ps
+    // console.log(players);
+    
 }
-export function gameRoom(tile, ws, setMap) {
+export function gameRoom(tile, ws, setMap, setWait, setStart) {
     // console.log("new map ===>", tile);
     // console.log({ players });
+    const [error, setError] = useState(false)
+    const [routes, SetRoutes] = useState([
+        { route: '#/', handler1: () => setWait(true), handler2: () => setGameover(false),handler3: () => setWinner(false), handler4: () => setStart(false), Error: () => setError(false) },
+        { route: '', handler: () => setError(true) }
+    ])
+    Routes(routes)
+    const [gameover, setGameover] = useState(false)
+    const [winner, setWinner] = useState(false)
 
     const [gameState, setGameState] = useState({
         players: [],
         bombs: [],
         powerUps: new Map()
     });
-    if (players.length == 1) {
-        document.querySelector(".root").appendChild(render({
-            tag: "div",
-            attrs: {
-                class: "message",
-            },
-            children: [`Player ${players[0].id} win, the game restart in 5 seconds`]
-        }))
-        ws.close()
-    }
+
     const updatePlayerState = (updatedPlayer) => {
         setGameState(prevState => ({
             ...prevState,
             players: updatedPlayer,
         }));
     };
-    let x = 0
 
     // Initialize players from tile map
     if (tile && players.length === 0) {
@@ -74,8 +52,8 @@ export function gameRoom(tile, ws, setMap) {
 
                         // Check if this player doesn't exist in our state yet
                         if (!players.find(p => p.username === square)) {
-                            x++
-                            // Add new       player to state
+                            // x++
+                            // Add new      player to state
                             const newPlayer = {
                                 position: {
                                     x: i,
@@ -89,7 +67,8 @@ export function gameRoom(tile, ws, setMap) {
                                 direction: "down",
                                 lives: 3,
                                 range: 1,
-                                speed: 200,
+                                speed: 100,
+                                bombs: 6,
                             };
                             players.push(newPlayer);
 
@@ -112,147 +91,184 @@ export function gameRoom(tile, ws, setMap) {
         });
 
     }
-    console.log(x);
-    movePlayer(ws, updatePlayerState, setMap, setGameState)
+    console.log({players});
+    
+    // console.log(x);
+    movePlayer(ws, updatePlayerState, setMap, setGameover, setWinner)
 
-    return {
-        tag: "div",
-        attrs: {
-            class: "container",
-        },
-        children: [
-            // Render the grid
-            ...(tile ? tile.map((row, i) => ({
-                tag: "div",
-                attrs: {
-                    class: "row",
-                },
-                children: row ? row.map((square, j) => {
-                    // Render path tiles
-                    if (`${square}` === "path") {
-                        return {
-                            tag: "div",
-                            attrs: {
-                                style: "background-color: green;",
-                                class: "path box",
-                            }
-                        };
-                    }
-                    // Render brick tiles
-                    else if (`${square}` === "brick") {
-                        return {
-                            tag: "div",
-                            attrs: {
-                                style: "background-color: yellow;",
-                                class: `brick y-${i} x-${j}`,
-                            }
-                        };
-                    }
-                    // Render wall tiles
-                    else if (`${square}` === "wall") {
-                        return {
-                            tag: "div",
-                            attrs: {
-                                style: "background-color: grey;",
-                                class: "wall box",
-                            }
-                        };
-                    } else if (`${square}` === "collision") {
-                        return (
-                            {
+    return (
+        error ? {
+            tag: "div",
+            attrs: { class: 'Error' },
+            children: [
+                {
+                    tag: 'p',
+                    children: ["Page not found"]
+                }, {
+                    tag: 'p',
+                    children: ['Error 404']
+                }
+            ]
+        } : gameover ? {
+            tag: "div",
+            attrs: {
+                class: "message",
+            },
+            children: [
+                {
+                    tag: "p",
+                    children: [`You Lose The Game`]
+                }, {
+                    tag: "button",
+                    attrs: {
+                        onclick: () => {
+                            navigate('#/')
+                        }
+                    },
+                    children: ['Restart The game']
+                }
+            ]
+        } : winner ? {
+            tag: "div",
+            attrs: {
+                class: "message",
+            },
+            children: [
+                {
+                    tag: "p",
+                    children: [`You Win The Game`]
+                }, {
+                    tag: "button",
+                    attrs: {
+                        onclick: () => {
+                            navigate('#/')
+                        }
+                    },
+                    children: ['Restart The game']
+                }
+            ]
+        } : {
+            tag: "div",
+            attrs: {
+                class: "container",
+            },
+            children: [
+                // Render the grid
+                ...(tile ? tile.map((row, i) => ({
+                    tag: "div",
+                    attrs: {
+                        class: "row",
+                    },
+                    children: row ? row.map((square, j) => {
+                        // Render path tiles
+                        if (`${square}` === "path") {
+                            return {
                                 tag: "div",
                                 attrs: {
-                                    //src: "./assets/Effect_Explosion_1.gif",
+                                    style: "background-color: green;",
                                     class: "path box",
-                                },
-                                children: [
-                                    {
-                                        tag: "img",
-                                        attrs: {
-                                            src: "./assets/Effect_Explosion_1.gif",
-                                            class: "collision",
-                                        }
-                                    }
-                                ]
-                            }
-                        )
-                    } else if (`${square}` === "speed") {
-                        return (
-                            {
+                                }
+                            };
+                        }
+                        // Render brick tiles
+                        else if (`${square}` === "brick") {
+                            return {
                                 tag: "div",
                                 attrs: {
-                                    //src: "./assets/Effect_Explosion_1.gif",
-                                    class: "path box",
-                                },
-                                children: [
-                                    {
-                                        tag: "img",
-                                        attrs: {
-                                            src: "./assets/speed.png",
-                                            class: "collision",
-                                        }
-                                    }
-                                ]
-                            }
-                        )
-                    } else if (`${square}` === "range") {
-                        return (
-                            {
+                                    style: "background-color: yellow;",
+                                    class: `brick y-${i} x-${j}`,
+                                }
+                            };
+                        }
+                        // Render wall tiles
+                        else if (`${square}` === "wall") {
+                            return {
                                 tag: "div",
                                 attrs: {
-                                    //src: "./assets/Effect_Explosion_1.gif",
-                                    class: "path box",
-                                },
-                                children: [
-                                    {
-                                        tag: "img",
-                                        attrs: {
-                                            src: "./assets/range.png",
-                                            class: "collision",
-                                        }
-                                    }
-                                ]
-                            }
-                        )
-                    } else if (`${square}` === "ExtraBomb") {
-                        return (
-                            {
-                                tag: "div",
-                                attrs: {
-                                    //src: "./assets/Effect_Explosion_1.gif",
-                                    class: "path box",
-                                },
-                                children: [
-                                    {
-                                        tag: "img",
-                                        attrs: {
-                                            src: "./assets/extraBomb.png",
-                                            class: "collision",
-                                        }
-                                    }
-                                ]
-                            }
-                        )
-                    }
-                    else {
-                        if (!square.includes("bomb")) {
-                            const player = players.find(p => p.id === square);
-                            if (player) {
-                                return {
+                                    style: "background-color: grey;",
+                                    class: "wall box",
+                                }
+                            };
+                        } else if (`${square}` === "collision") {
+                            return (
+                                {
                                     tag: "div",
                                     attrs: {
+                                        //src: "./assets/Effect_Explosion_1.gif",
                                         class: "path box",
                                     },
                                     children: [
-                                        createPlayer(player)
+                                        {
+                                            tag: "img",
+                                            attrs: {
+                                                src: "./assets/Effect_Explosion_1.gif",
+                                                class: "collision",
+                                            }
+                                        }
                                     ]
                                 }
-                            }
-                        } else {
-                            const slice = square.split("-");
-                            // console.log(slice.length);
-                            if (slice.length == 2) {
-                                const player = players.find(p => p.id === slice[1]);
+                            )
+                        } else if (`${square}` === "speed") {
+                            return (
+                                {
+                                    tag: "div",
+                                    attrs: {
+                                        //src: "./assets/Effect_Explosion_1.gif",
+                                        class: "path box",
+                                    },
+                                    children: [
+                                        {
+                                            tag: "img",
+                                            attrs: {
+                                                src: "./assets/speed.png",
+                                                class: "collision",
+                                            }
+                                        }
+                                    ]
+                                }
+                            )
+                        } else if (`${square}` === "range") {
+                            return (
+                                {
+                                    tag: "div",
+                                    attrs: {
+                                        //src: "./assets/Effect_Explosion_1.gif",
+                                        class: "path box",
+                                    },
+                                    children: [
+                                        {
+                                            tag: "img",
+                                            attrs: {
+                                                src: "./assets/range.png",
+                                                class: "collision",
+                                            }
+                                        }
+                                    ]
+                                }
+                            )
+                        } else if (`${square}` === "ExtraBomb") {
+                            return (
+                                {
+                                    tag: "div",
+                                    attrs: {
+                                        //src: "./assets/Effect_Explosion_1.gif",
+                                        class: "path box",
+                                    },
+                                    children: [
+                                        {
+                                            tag: "img",
+                                            attrs: {
+                                                src: "./assets/extraBomb.png",
+                                                class: "collision",
+                                            }
+                                        }
+                                    ]
+                                }
+                            )
+                        }
+                        else {
+                            if (!square.includes("bomb")) {
+                                const player = players.find(p => p.id === square);
                                 if (player) {
                                     return {
                                         tag: "div",
@@ -260,35 +276,53 @@ export function gameRoom(tile, ws, setMap) {
                                             class: "path box",
                                         },
                                         children: [
-                                            createBomb(i, j),
                                             createPlayer(player)
                                         ]
                                     }
                                 }
                             } else {
-                                return {
-                                    tag: "div",
-                                    attrs: {
-                                        class: "path box",
-                                    },
-                                    children: [
-                                        createBomb(i, j)
-                                    ]
+                                const slice = square.split("-");
+                                // console.log(slice.length);
+                                if (slice.length == 2) {
+                                    const player = players.find(p => p.id === slice[1]);
+                                    if (player) {
+                                        return {
+                                            tag: "div",
+                                            attrs: {
+                                                class: "path box",
+                                            },
+                                            children: [
+                                                createBomb(i, j),
+                                                createPlayer(player)
+                                            ]
+                                        }
+                                    }
+                                } else {
+                                    return {
+                                        tag: "div",
+                                        attrs: {
+                                            class: "path box",
+                                        },
+                                        children: [
+                                            createBomb(i, j)
+                                        ]
+                                    }
                                 }
-                            }
 
-                        }
-                        return {
-                            tag: "div",
-                            attrs: {
-                                class: "path box"
                             }
-                        };
-                    }
-                }) : []
-            })) : [])
-        ]
-    };
+                            return {
+                                tag: "div",
+                                attrs: {
+                                    class: "path box"
+                                }
+                            };
+                        }
+                    }) : []
+                })) : [])
+            ]
+        }
+
+    );
 }
 
 let first = true;
@@ -315,7 +349,7 @@ export function createPlayer(player) {
                 attrs: {
                     class: "labelP"
                 },
-                children: [player.id]
+                children: [`❤️ ${player.lives}`]
             },
             {
                 tag: "img",

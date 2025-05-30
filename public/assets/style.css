@@ -156,19 +156,15 @@ input:focus {
   z-index: 4;
 }
 
-/* .message {
-    background-color: #ffeb3b; 
-    color: #333; 
-    padding: 15px 25px;
-    margin: 20px auto;
-    font-size: 20px;
-    font-weight: bold;
-    text-align: center;
-    border-radius: 10px;
-    width: fit-content;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    animation: pop 0.5s ease;
-} */
+	.Error {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20%;
+    font-size: 40px;
+    color: red;
+}
 
 .message {
   display: grid;
