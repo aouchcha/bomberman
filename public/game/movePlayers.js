@@ -1,5 +1,5 @@
 import { players, updatePlayers, ResetPlayers } from "./gameRoom.js";
-import { render } from "../Apex/dom.js";
+// import { render } from "../Apex/dom.js";
 
 // const POWERUP_CHANCE = 0.5;
 // const speed = 5;
@@ -68,11 +68,13 @@ function movingPlayerAnimation() {
 export function movePlayer(ws, updatePlayerState, setMap, setGameover, setWinner) {
     ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        if (data.type == "xxx") {
+        if (data.type == "gameover") {
             console.log("l7wa");
 
-            // ResetPlayers2(players, data.username)
-            // updatePlayerState(players)
+            ws.close();
+            updatePlayers([])
+            setMap([])
+            setWinner(true)
             return;
         }
         if (data.type === "mouvement") {
@@ -99,7 +101,7 @@ export function movePlayer(ws, updatePlayerState, setMap, setGameover, setWinner
             // setMap(data.grid);
         }
         else if (data.type === "bombPlaced") {
-            // console.log({ grid: data.grid });
+            console.log({ grid: data.grid });
             setMap(data.grid)
         }
         else if (data.type === "bombExploded") {

@@ -90,7 +90,7 @@ wss.on("connection", (ws, req) => {
     //     },
     // }
     // console.log("player ===> ", player)
-    waitingRoom.addPlayer({username:username, soket:ws});
+    waitingRoom.addPlayer({ username: username, soket: ws });
     if (waitingRoom.players.size >= 2 && waitingRoom.status === "waiting") {
         waitingRoom.startTimer();
     }
@@ -111,7 +111,7 @@ wss.on("connection", (ws, req) => {
         let movingPlayer = {};
         if (data.type == "move") {
             // console.log(data);
-            
+
             let { position, players, myplayer } = updatePosition(data.direction, data.position, data.username, data.myplayer, data.players)
             movingPlayer = data
 
@@ -170,6 +170,8 @@ wss.on("connection", (ws, req) => {
 
 
         if (data.type == "bombPlaced") {
+            console.log("hello a wld nass");
+
             const bombPosition = { ...data.position };
             grid[bombPosition.x][bombPosition.y] = `bomb-${data.username}`;
             // console.log(powerUps);
@@ -194,8 +196,9 @@ wss.on("connection", (ws, req) => {
             for (const [_, value] of waitingRoom.players.entries()) {
                 value.send(JSON.stringify({
                     type: "bombPlaced",
-                    position: data.position,
+                    // position: data.position,
                     grid: grid,
+                    // players: data.players
                     // myplayer: data.myplayer,
                 }));
             }
@@ -322,19 +325,19 @@ wss.on("connection", (ws, req) => {
                         //     // trySpawnPowerUp(pos);
                         // }
                         if (pl.position.x == pos.x && pl.position.y == pos.y) {
-                            
+
                             pl.lives--;
                             data.myplayer = pl
                             // console.log(pl.lives);
-                            
+
                         }
                     }
                 })
                 if (pl.lives > 0) {
                     grid[pl.position.x][pl.position.y] = pl.id
-                }else {
+                } else {
                     // console.log("hanni alkhra");
-                    
+
                     grid[pl.position.x][pl.position.y] = "path"
                 }
             });
@@ -403,16 +406,16 @@ wss.on("connection", (ws, req) => {
                     players: data.players,
                 }));
             }
-        }else if (data.type == "lose") {
-             for (const [key, value] of waitingRoom.players.entries()) {
+        } else if (data.type == "lose") {
+            for (const [key, value] of waitingRoom.players.entries()) {
                 if (key === data.myplayer.id) {
                     value.send(JSON.stringify({
                         type: "lose",
                     }));
                 }
             }
-        }else if (data.type == "win") {
-             for (const [key, value] of waitingRoom.players.entries()) {
+        } else if (data.type == "win") {
+            for (const [key, value] of waitingRoom.players.entries()) {
                 if (key === data.myplayer.id) {
                     value.send(JSON.stringify({
                         type: "win",
@@ -424,21 +427,20 @@ wss.on("connection", (ws, req) => {
 
     ws.on("close", () => {
         let userid;
-         for (const [key, value] of waitingRoom.players.entries()) {
-                if (value === ws) {
-                    userid = key
-                }
+        for (const [key, value] of waitingRoom.players.entries()) {
+            if (value === ws) {
+                userid = key
             }
+        }
         waitingRoom.removePlayer(userid);
         playersUsernames.delete(username);
         setLength.len = playersUsernames.size;
-            console.log(waitingRoom.players.size);
-            
+        console.log(waitingRoom.players.size);
+
         // console.log(`player ==================> `, playersUsernames);
         // console.log(`player ==========> `, waitingRoom.players.size);
         // console.log(`Started ==========> `, started);
         if (waitingRoom.players.size === 1) {
-            waitingRoom.players.clear();
             for (let i = 0; i < grid.length; i++) {
                 for (let j = 0; j < grid[i].length; j++) {
                     if (grid[i][j] !== "wall") {
@@ -446,23 +448,24 @@ wss.on("connection", (ws, req) => {
                     }
                 }
             }
+            waitingRoom.players.clear();
 
             powerUps.clear();
             once = true;
             started = false;
 
             console.log("game ended!!!!!!!!!!!!");
+            for (const [key, value] of waitingRoom.players.entries()) {
+                //console.log("OVEEEEEEEEEEEEEEEEEEEEEEEEEEEER wlad L9hab");
+                value.send(JSON.stringify({
+                    type: "gameover",
+                    message: "Game Over",
+                    username: key,
+                }));
 
-        //     for (const [key, value] of waitingRoom.players.entries()) {
-        //         //console.log("OVEEEEEEEEEEEEEEEEEEEEEEEEEEEER wlad L9hab");
-        //         value.send(JSON.stringify({
-        //             type: "xxx",
-        //             message: "Game Over",
-        //             username: key,
-        //         }));
-
-        //     }
+            }
         }
+
     })
     // console.log(`Started after close ==========> `, started);
     // 
@@ -526,7 +529,7 @@ function updatePosition(direction, position, username, myplayer, players) {
 
                 break;
             case 'ExtraBomb':
-                 players.forEach((p) => {
+                players.forEach((p) => {
                     if (p.id == myplayer.id && p.bombs > 0) {
                         console.log("hanni f speed");
 
@@ -536,7 +539,7 @@ function updatePosition(direction, position, username, myplayer, players) {
                 })
         }
         // console.log({key:powerUpKey, type:powerUpType});
-        
+
         powerUps.delete(powerUpKey);
         setTimeout(() => {
             for (const [_, value] of waitingRoom.players.entries()) {
@@ -576,7 +579,7 @@ function trySpawnPowerUp(position) {
 
 function Obstacles(position, direction, myplayer) {
     // console.log({myplayer});
-    
+
     if (started) {
         checkSomething(grid);
         started = false;

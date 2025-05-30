@@ -16,8 +16,7 @@ export function updatePlayers(ps) {
     
 }
 export function gameRoom(tile, ws, setMap, setWait, setStart) {
-    // console.log("new map ===>", tile);
-    // console.log({ players });
+    
     const [error, setError] = useState(false)
     const [routes, SetRoutes] = useState([
         { route: '#/', handler1: () => setWait(true), handler2: () => setGameover(false),handler3: () => setWinner(false), handler4: () => setStart(false), Error: () => setError(false) },

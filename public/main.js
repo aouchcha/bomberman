@@ -1,6 +1,7 @@
 // Frontend controller: HTTP + WS logic
 import { useState } from "./Apex/core.js";
 import { waitingRoom } from "./render.js";
+import { players } from "./game/gameRoom.js";
 
 let ws
 
