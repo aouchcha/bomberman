@@ -65,7 +65,7 @@ const server = http.createServer((req, res) => {
 });
 
 
-const waitingRoom = new WaitingRoom();
+export const waitingRoom = new WaitingRoom();
 const wss = new WebSocketServer({ server });
 
 let once = true;
@@ -170,7 +170,7 @@ wss.on("connection", (ws, req) => {
 
 
         if (data.type == "bombPlaced") {
-            console.log("hello a wld nass");
+            // console.log("hello a wld nass");
 
             const bombPosition = { ...data.position };
             grid[bombPosition.x][bombPosition.y] = `bomb-${data.username}`;
@@ -190,7 +190,17 @@ wss.on("connection", (ws, req) => {
             // Update player positions
             data.players.forEach(pl => {
                 if (pl.id != data.username) {
-                    grid[pl.position.x][pl.position.y] = pl.id;
+                    console.log({ "wa zebi": grid[pl.position.x][pl.position.y] });
+
+                    if (grid[pl.position.x][pl.position.y] == "path") {
+                        console.log("wa zebbi 2");
+
+                        grid[pl.position.x][pl.position.y] = pl.id;
+                    } else if (grid[pl.position.x][pl.position.y].includes("bomb-")) {
+                        console.log("wa zebbi 3");
+
+                        grid[bombPosition.x][bombPosition.y] += `-${pl.id}`
+                    }
                 }
             });
             for (const [_, value] of waitingRoom.players.entries()) {
@@ -368,7 +378,15 @@ wss.on("connection", (ws, req) => {
                 }
             }
             data.players.forEach(pl => {
-                grid[pl.position.x][pl.position.y] = pl.id;
+                if (grid[pl.position.x][pl.position.y] == "path") {
+                        console.log("wa zebbi 2");
+
+                        grid[pl.position.x][pl.position.y] = pl.id;
+                    } else {
+                        console.log("wa zebbi 3");
+
+                        grid[pl.position.x][pl.position.y] += `-${pl.id}`
+                    }
             });
             // console.log(waitingRoom.players.get(data.myplayer.id).sender);
 
@@ -432,6 +450,8 @@ wss.on("connection", (ws, req) => {
                 userid = key
             }
         }
+        // console.log({username});
+
         waitingRoom.removePlayer(userid);
         playersUsernames.delete(username);
         setLength.len = playersUsernames.size;
@@ -448,22 +468,25 @@ wss.on("connection", (ws, req) => {
                     }
                 }
             }
-            waitingRoom.players.clear();
 
             powerUps.clear();
-            once = true;
-            started = false;
-
+            
             console.log("game ended!!!!!!!!!!!!");
             for (const [key, value] of waitingRoom.players.entries()) {
                 //console.log("OVEEEEEEEEEEEEEEEEEEEEEEEEEEEER wlad L9hab");
                 value.send(JSON.stringify({
                     type: "gameover",
-                    message: "Game Over",
-                    username: key,
+                    // message: "Game Over",
+                    // username: key,
                 }));
-
+                
             }
+            started = false;
+            once = true;
+            waitingRoom.players.clear();
+            playersUsernames.clear();
+            waitingRoom.status = "waiting";
+
         }
 
     })

@@ -14,7 +14,7 @@ export class WaitingRoom {
     }
 
     addPlayer(player) {
-        console.log({name:player.username});
+        // console.log({name:player.username});
         
         if (this.players.size == 2 && this.status == 'waiting') {
             this.startTimer();
@@ -134,7 +134,7 @@ export class WaitingRoom {
             type: "grid",
             players: [...this.players.keys()].map(p => ({ username: p.username })),
             map: createPlayer(tile.board, this.players.size, [...this.players.keys()]),
-            // position: { x: 1, y: 1 },
+            position: { x: 1, y: 1 },
         });
     }
 }

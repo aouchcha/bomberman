@@ -13,13 +13,13 @@ export function ResetPlayers(ps) {
 export function updatePlayers(ps) {
     players = ps
     // console.log(players);
-    
+
 }
 export function gameRoom(tile, ws, setMap, setWait, setStart) {
-    
+
     const [error, setError] = useState(false)
     const [routes, SetRoutes] = useState([
-        { route: '#/', handler1: () => setWait(true), handler2: () => setGameover(false),handler3: () => setWinner(false), handler4: () => setStart(false), Error: () => setError(false) },
+        { route: '#/', handler1: () => setWait(true), handler2: () => setGameover(false), handler3: () => setWinner(false), handler4: () => setStart(false), Error: () => setError(false) },
         { route: '', handler: () => setError(true) }
     ])
     Routes(routes)
@@ -66,7 +66,7 @@ export function gameRoom(tile, ws, setMap, setWait, setStart) {
                                 direction: "down",
                                 lives: 3,
                                 range: 1,
-                                speed: 100,
+                                speed: 250,
                                 bombs: 6,
                             };
                             players.push(newPlayer);
@@ -90,8 +90,8 @@ export function gameRoom(tile, ws, setMap, setWait, setStart) {
         });
 
     }
-    console.log({players});
-    
+    // console.log({ players });
+
     // console.log(x);
     movePlayer(ws, updatePlayerState, setMap, setGameover, setWinner)
 
@@ -121,7 +121,10 @@ export function gameRoom(tile, ws, setMap, setWait, setStart) {
                     tag: "button",
                     attrs: {
                         onclick: () => {
-                            navigate('#/')
+                            setWait(true),
+                                setGameover(false),
+                                setWinner(false),
+                                setStart(false)
                         }
                     },
                     children: ['Restart The game']
@@ -140,7 +143,10 @@ export function gameRoom(tile, ws, setMap, setWait, setStart) {
                     tag: "button",
                     attrs: {
                         onclick: () => {
-                            navigate('#/')
+                            setWait(true),
+                                setGameover(false),
+                                setWinner(false),
+                                setStart(false)
                         }
                     },
                     children: ['Restart The game']
@@ -267,36 +273,127 @@ export function gameRoom(tile, ws, setMap, setWait, setStart) {
                         }
                         else {
                             if (!square.includes("bomb")) {
-                                const player = players.find(p => p.id === square);
-                                if (player) {
+                                const slice = square.split("-")
+                                console.log({ SlPL: slice, Len: slice.length });
+
+                                // helper(slice)
+                                // if (slice.length == 2) {
+                                //     const player1 = players.find(p => p.id === slice[0]);
+                                //     const player2 = players.find(p => p.id === slice[1]);
+                                //     if (player1 && player2) {
+                                // slice.map((pl, i) => {
+                                //     const player = players.find(p => p.id === pl);
+                                //     console.log({ player });
+
+                                //     if (player) {
+                                //         console.log({ i });
+                                //         return {
+                                //             tag: "div",
+                                //             attrs: {
+                                //                 class: "path box",
+                                //             },
+                                //             children: [
+                                //                 createPlayer(player)
+                                //             ]
+                                //         }
+                                //     }
+                                // })
+                                return {
+                                    tag: "div",
+                                    attrs: {
+                                        class: "path box",
+                                    },
+                                    children: [
+                                        ...slice.map((pl, i) => {
+                                            const player = players.find(p => p.id === pl);
+                                            console.log({ player });
+
+                                            if (player) {
+                                                console.log({ i });
+                                                return {
+                                                    tag: "div",
+                                                    attrs: {
+                                                        class: "path box",
+                                                    },
+                                                    children: [
+                                                        createPlayer(player)
+                                                    ]
+                                                }
+                                            }
+                                        })
+                                    ]
+                                }
+                                //     }
+                                // } else {
+                                //     const slice = square.split("-")
+                                //     console.log({slice});
+
+                                //     const player = players.find(p => p.id === square);
+                                //     if (player) {
+                                //         return {
+                                //             tag: "div",
+                                //             attrs: {
+                                //                 class: "path box",
+                                //             },
+                                //             children: [
+                                //                 createPlayer(player)
+                                //             ]
+                                //         }
+                                //     }
+                                // }
+                            } else {
+                                const slice = square.split("-");
+                                // if (slice.length == 3) {
+                                //     const player1 = players.find(p => p.id === slice[1]);
+                                //     const player2 = players.find(p => p.id === slice[2]);
+                                //     if (player1 && player2) {
+                                //         return {
+                                //             tag: "div",
+                                //             attrs: {
+                                //                 class: "path box",
+                                //             },
+                                //             children: [
+                                //                 createBomb(i, j),
+                                //                 createPlayer(player1),
+                                //                 createPlayer(player2)
+                                //             ]
+                                //         }
+                                //     }
+                                // }
+                                if (slice.length > 1) {
+                                    // console.log({ SlBomb: slice.slice(1), Len: slice.slice(1).length });
+                                    // const player = players.find(p => p.id === slice[1]);
+                                    // if (player) {
                                     return {
                                         tag: "div",
                                         attrs: {
                                             class: "path box",
                                         },
                                         children: [
-                                            createPlayer(player)
+                                            createBomb(i, j),
+                                            ...slice.slice(1).map((pl, i) => {
+                                            const player = players.find(p => p.id === pl);
+                                            console.log({ player });
+
+                                            if (player) {
+                                                console.log({ i });
+                                                return {
+                                                    tag: "div",
+                                                    attrs: {
+                                                        class: "path box",
+                                                    },
+                                                    children: [
+                                                        createPlayer(player)
+                                                    ]
+                                                }
+                                            }
+                                        })
                                         ]
                                     }
-                                }
-                            } else {
-                                const slice = square.split("-");
-                                // console.log(slice.length);
-                                if (slice.length == 2) {
-                                    const player = players.find(p => p.id === slice[1]);
-                                    if (player) {
-                                        return {
-                                            tag: "div",
-                                            attrs: {
-                                                class: "path box",
-                                            },
-                                            children: [
-                                                createBomb(i, j),
-                                                createPlayer(player)
-                                            ]
-                                        }
-                                    }
+                                    // }
                                 } else {
+                                    console.log({ SlBomb: slice, Len: slice.length });
+
                                     return {
                                         tag: "div",
                                         attrs: {
@@ -309,12 +406,6 @@ export function gameRoom(tile, ws, setMap, setWait, setStart) {
                                 }
 
                             }
-                            return {
-                                tag: "div",
-                                attrs: {
-                                    class: "path box"
-                                }
-                            };
                         }
                     }) : []
                 })) : [])
@@ -324,7 +415,25 @@ export function gameRoom(tile, ws, setMap, setWait, setStart) {
     );
 }
 
-let first = true;
+function helper(slice) {
+    slice.map((pl, i) => {
+        const player = players.find(p => p.id === pl);
+        console.log({ player });
+
+        if (player) {
+            console.log({ i });
+            return {
+                tag: "div",
+                attrs: {
+                    class: "path box",
+                },
+                children: [
+                    createPlayer(player)
+                ]
+            }
+        }
+    })
+}
 
 export function createPlayer(player) {
     // let x = player.position.x;

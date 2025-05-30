@@ -1,26 +1,32 @@
 // Helpers: random ID, timers, etc.
 
+// import { use } from "react";
+
 const Positions = {
     topLeft: { x: 1, y: 1 },
-    topRight: { x: 1, y: 2 },
+    topRight: { x: 21, y: 1 },
     bottomLeft: { x: 1, y: 13 },
     bottomRight: { x: 21, y: 13 },
 };
 
 export function createPlayer(tile, nbPlayers, usernames) {
+    let i = 1;
     usernames.forEach((username) => {
-        if (nbPlayers == 1) {
+        // console.log({username});
+        
+        if (i == 1) {
             tile[Positions.topLeft.y][Positions.topLeft.x] = username;
+            i++
         }
-        if (nbPlayers == 2) {
+        else if (i == 2) {
             tile[Positions.topRight.y][Positions.topRight.x] = username;
-            nbPlayers--;
-        } else if (nbPlayers == 3) {
+            i++
+        } else if (i == 3) {
             tile[Positions.bottomLeft.y][Positions.bottomLeft.x] = username;
-            nbPlayers--;
-        } else if (nbPlayers == 4) {
+            i++
+        } else if (i == 4) {
             tile[Positions.bottomRight.y][Positions.bottomRight.x] = username;
-            nbPlayers--;
+            // i++
         }
     });
 

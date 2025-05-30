@@ -120,9 +120,9 @@ export function movePlayer(ws, updatePlayerState, setMap, setGameover, setWinner
             // if (data.myplayer)
             updatePlayers(data.players);
             movingPlayerAnimation()
-            console.log({ALL:data.players});
+            // console.log({ALL:data.players});
             
-            console.log({Me:myPlayer});
+            // console.log({Me:myPlayer});
 
             if (myPlayer.lives == 0) {
                 ws.send(JSON.stringify({
@@ -151,6 +151,7 @@ export function movePlayer(ws, updatePlayerState, setMap, setGameover, setWinner
 
         } else if (data.type === "newgrid") {
            
+            console.log({newgrid:data.grid});
             
            
             updatePlayers(data.players);
@@ -175,7 +176,7 @@ export function movePlayer(ws, updatePlayerState, setMap, setGameover, setWinner
             // }));
             // console.log();
             
-            console.log({ PP: data.players });
+            // console.log({ PP: data.players });
 
             updatePlayers(data.players);
             // updatePlayerState(data.myplayer)
@@ -246,7 +247,7 @@ export function movePlayer(ws, updatePlayerState, setMap, setGameover, setWinner
                 break;
             case ' ':
                 movingPlayerAnimation(event.key, event.key, directions.keySpace);
-                console.log({ Time_Between_Bombs });
+                // console.log({ Time_Between_Bombs });
 
                 bombing(ws, myPlayer)
                 break;
@@ -264,7 +265,7 @@ function bombing(ws, myplayer) {
       movingPlayerAnimation(' ', ' ', directions.keySpace);
       
       if (myplayer) {
-         console.log("hanni", myplayer.bombs);
+        //  console.log("hanni", myplayer.bombs);
          Time_Between_Bombs = myplayer.bombs;
       }
 
