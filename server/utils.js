@@ -4,7 +4,7 @@
 
 const Positions = {
     topLeft: { x: 1, y: 1 },
-    topRight: { x: 21, y: 1 },
+    topRight: { x: 1, y: 2 },
     bottomLeft: { x: 1, y: 13 },
     bottomRight: { x: 21, y: 13 },
 };

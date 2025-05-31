@@ -110,7 +110,6 @@ wss.on("connection", (ws, req) => {
 
         let movingPlayer = {};
         if (data.type == "move") {
-            // console.log(data);
 
             let { position, players, myplayer } = updatePosition(data.direction, data.position, data.username, data.myplayer, data.players)
             movingPlayer = data
@@ -119,14 +118,22 @@ wss.on("connection", (ws, req) => {
 
             for (let i = 0; i < grid.length; i++) {
                 for (let j = 0; j < grid[i].length; j++) {
-                    if (grid[i][j] !== "brick" && grid[i][j] !== "wall" && !grid[i][j].includes("bomb") && !powerUps.has(`${i},${j}`)) {
+                    if (grid[i][j] !== "brick" && grid[i][j] !== "wall" && !grid[i][j].includes("bomb-") && !powerUps.has(`${i},${j}`)) {
                         grid[i][j] = "path";
                     }
                 }
             }
             players.forEach(pl => {
 
-                grid[pl.position.x][pl.position.y] = pl.id;
+               if (grid[pl.position.x][pl.position.y] == "path") {
+                        // console.log("wa zebbi 2");
+
+                        grid[pl.position.x][pl.position.y] = pl.id;
+                    } else if (grid[pl.position.x][pl.position.y].includes("bomb")) {
+                        // console.log("wa zebbi 3");
+
+                        grid[pl.position.x][pl.position.y] += `-${pl.id}`
+                    }
             });
 
             // SuperPowers.forEach((pos) => {
@@ -179,7 +186,7 @@ wss.on("connection", (ws, req) => {
             // Reset non-wall/brick tiles to path
             for (let i = 0; i < grid.length; i++) {
                 for (let j = 0; j < grid[i].length; j++) {
-                    if (grid[i][j] !== "brick" && grid[i][j] !== "wall" && !grid[i][j].includes("bomb") && !powerUps.has(`${i},${j}`)) {
+                    if (grid[i][j] !== "brick" && grid[i][j] !== "wall" && !grid[i][j].includes("bomb-") && !powerUps.has(`${i},${j}`)) {
                         // console.log({check:!powerUps.has(i,j), content: grid[i][j]});
 
                         grid[i][j] = "path";
@@ -190,14 +197,14 @@ wss.on("connection", (ws, req) => {
             // Update player positions
             data.players.forEach(pl => {
                 if (pl.id != data.username) {
-                    console.log({ "wa zebi": grid[pl.position.x][pl.position.y] });
+                    // console.log({ "wa zebi": grid[pl.position.x][pl.position.y] });
 
                     if (grid[pl.position.x][pl.position.y] == "path") {
-                        console.log("wa zebbi 2");
+                        // console.log("wa zebbi 2");
 
                         grid[pl.position.x][pl.position.y] = pl.id;
-                    } else if (grid[pl.position.x][pl.position.y].includes("bomb-")) {
-                        console.log("wa zebbi 3");
+                    } else if (grid[pl.position.x][pl.position.y].includes("bomb")) {
+                        // console.log("wa zebbi 3");
 
                         grid[bombPosition.x][bombPosition.y] += `-${pl.id}`
                     }
@@ -497,8 +504,9 @@ wss.on("connection", (ws, req) => {
 })
 
 function updatePosition(direction, position, username, myplayer, players) {
-    let isSuperPower = false;
+    // let isSuperPower = false;
     // console.log(Obstacles(position, direction));
+            console.log(grid[1]);
 
     if (Obstacles(position, direction, myplayer)) {
         if (direction === 'up') {
@@ -522,7 +530,7 @@ function updatePosition(direction, position, username, myplayer, players) {
     // Check if player moved to a power-up position
     const powerUpKey = `${position.x},${position.y}`;
     if (powerUps.has(powerUpKey)) {
-        isSuperPower = true;
+        // isSuperPower = true;
         const powerUpType = powerUps.get(powerUpKey);
         // console.log(players);
         // console.log(myplayer);
@@ -575,7 +583,7 @@ function updatePosition(direction, position, username, myplayer, players) {
                     players: players
                 }));
             }
-        }, 100);
+        }, myplayer.speed + 16.77);
         // console.log({myplayer});
 
 
@@ -583,22 +591,6 @@ function updatePosition(direction, position, username, myplayer, players) {
     return { position, players, myplayer }
 }
 
-function trySpawnPowerUp(position) {
-    // console.log(position);
-
-    // Remove random chance - always spawn a power-up
-    // const types = [POWERUP_TYPES.SPEED, POWERUP_TYPES.RANGE, POWERUP_TYPES.EXTRABOMB];
-    // const type = types[Math.floor(Math.random() * types.length)];
-    // powerUps.set(`${position.x},${position.y}`, type);
-    // grid[position.x][position.y] = type;
-    // for (const [key, value] of waitingRoom.players.entries()) {
-    //     value.send(JSON.stringify({
-    //         type: "powerUpSpawned",
-    //         position: position,
-    //         powerUpType: type
-    //     }));
-    // }
-}
 
 function Obstacles(position, direction, myplayer) {
     // console.log({myplayer});
@@ -609,27 +601,28 @@ function Obstacles(position, direction, myplayer) {
     }
     const nextX = position.y + (direction === 'right' ? 1 : direction === 'left' ? -1 : 0);
     const nextY = position.x + (direction === 'down' ? 1 : direction === 'up' ? -1 : 0);
-
-    if (grid[nextY] && grid[nextX] && grid[nextY][nextX] == "bomb" || grid[nextY][nextX] == "wall" || grid[nextY][nextX] == "brick" || grid[nextY][nextX].includes("bomb")) {
-        // console.log(grid[nextX][nextY]);
+    console.log(grid[nextY][nextX].includes("bomb-"), grid[nextY][nextX]);
+    
+    if ((!grid[nextY][nextX] || grid[nextY][nextX] == "bomb" || grid[nextY][nextX] == "wall" || grid[nextY][nextX] == "brick" || grid[nextY][nextX].includes("bomb")) ){
+        console.log(nextX,nextY);
 
         return false;
     }
     return true;
 }
 
-export function throttle(func, delay) {
-    let isWaiting = false;
-    return function executedFunction(...args) {
-        if (!isWaiting) {
-            func.apply(this, args);
-            isWaiting = true;
-            setTimeout(() => {
-                isWaiting = false;
-            }, delay);
-        }
-    };
-}
+// export function throttle(func, delay) {
+//     let isWaiting = false;
+//     return function executedFunction(...args) {
+//         if (!isWaiting) {
+//             func.apply(this, args);
+//             isWaiting = true;
+//             setTimeout(() => {
+//                 isWaiting = false;
+//             }, delay);
+//         }
+//     };
+// }
 
 server.listen(8080, () => {
     console.log('Server running on http://localhost:8080');

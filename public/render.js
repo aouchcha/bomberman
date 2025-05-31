@@ -1,5 +1,5 @@
 import { Chat } from './Chat.js';
-import { createBackgroundMusic, createLivesDisplay, createMusicToggleButton, gameRoom } from './game/gameRoom.js';
+import { createBackgroundMusic, createMusicToggleButton, gameRoom } from './game/gameRoom.js';
 import { useState } from './Apex/core.js';
 
 // Store the current message handler and chat history

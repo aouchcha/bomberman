@@ -274,7 +274,7 @@ export function gameRoom(tile, ws, setMap, setWait, setStart) {
                         else {
                             if (!square.includes("bomb")) {
                                 const slice = square.split("-")
-                                console.log({ SlPL: slice, Len: slice.length });
+                                // console.log({ SlPL: slice, Len: slice.length });
 
                                 // helper(slice)
                                 // if (slice.length == 2) {
@@ -306,10 +306,10 @@ export function gameRoom(tile, ws, setMap, setWait, setStart) {
                                     children: [
                                         ...slice.map((pl, i) => {
                                             const player = players.find(p => p.id === pl);
-                                            console.log({ player });
+                                            // console.log({ player });
 
                                             if (player) {
-                                                console.log({ i });
+                                                // console.log({ i });
                                                 return {
                                                     tag: "div",
                                                     attrs: {
@@ -376,7 +376,7 @@ export function gameRoom(tile, ws, setMap, setWait, setStart) {
                                             console.log({ player });
 
                                             if (player) {
-                                                console.log({ i });
+                                                // console.log({ i });
                                                 return {
                                                     tag: "div",
                                                     attrs: {
@@ -475,6 +475,7 @@ export function createPlayer(player) {
 export function createBomb(x, y) {
 
     return {
+        tag: "div",
         attrs: {
             class: "Bomber",
             style: `height: 50px; width: 50px; position: absolute; top: ${x * 50}px; left: ${y * 50}px`
@@ -492,43 +493,43 @@ export function createBomb(x, y) {
     }
 
 }
-export function createLivesDisplay(ws) {
-    const [lives, setLives] = useState(0);
+// export function createLivesDisplay(ws) {
+//     const [lives, setLives] = useState(0);
 
-    ws.addEventListener("message", (event) => {
-        const data = JSON.parse(event.data);
-        if (data.type === "PlayerLives") {
-            setLives(data.live);
-        }
-    });
+//     ws.addEventListener("message", (event) => {
+//         const data = JSON.parse(event.data);
+//         if (data.type === "PlayerLives") {
+//             setLives(data.live);
+//         }
+//     });
 
-    return {
-        tag: "div",
-        attrs: {
-            class: "lives-display",
-        },
-        children: [
-            {
-                tag: "div",
-                attrs: {
-                    class: "lives-container",
-                },
-                children: [
-                    {
-                        tag: "span",
-                        attrs: { class: "lives-icon" },
-                        children: ["❤️"],
-                    },
-                    {
-                        tag: "span",
-                        attrs: { class: "lives-count" },
-                        children: [String(lives)],
-                    }
-                ]
-            }
-        ]
-    }
-}
+//     return {
+//         tag: "div",
+//         attrs: {
+//             class: "lives-display",
+//         },
+//         children: [
+//             {
+//                 tag: "div",
+//                 attrs: {
+//                     class: "lives-container",
+//                 },
+//                 children: [
+//                     {
+//                         tag: "span",
+//                         attrs: { class: "lives-icon" },
+//                         children: ["❤️"],
+//                     },
+//                     {
+//                         tag: "span",
+//                         attrs: { class: "lives-count" },
+//                         children: [String(lives)],
+//                     }
+//                 ]
+//             }
+//         ]
+//     }
+// }
 
 
 export function createBackgroundMusic() {
