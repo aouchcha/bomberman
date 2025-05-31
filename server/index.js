@@ -583,7 +583,7 @@ function updatePosition(direction, position, username, myplayer, players) {
                     players: players
                 }));
             }
-        }, myplayer.speed + 16.77);
+        }, 500);
         // console.log({myplayer});
 
 

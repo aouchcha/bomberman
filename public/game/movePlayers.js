@@ -195,7 +195,7 @@ export function movePlayer(ws, updatePlayerState, setMap, setGameover, setWinner
     }
 
 
-    document.onkeydown = (event) => {
+    document.onkeyup = (event) => {
         const currentTime = Date.now();
         const requiredDelay = 16.67;
         switch (event.key) {

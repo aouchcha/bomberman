@@ -462,7 +462,7 @@ export function createPlayer(player) {
             {
                 tag: "img",
                 attrs: {
-                    class: `Character_spritesheet pixelart face-${player.direction}`,
+                    class: `Character_spritesheet pixelart face-${player.direction}-move`,
                     src: "assets/redLink.png",
                     alt: "Character",
                 }
