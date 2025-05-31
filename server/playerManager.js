@@ -5,8 +5,7 @@ import { waitingRoom } from "./index.js";
 export function joining(req, res) {
     let body = [];
     let resu;
-
-    req.on("data", (chunk) => {
+     req.on("data", (chunk) => {
         body.push(chunk);
     })
 
