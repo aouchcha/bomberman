@@ -3,7 +3,6 @@ import { createPlayer } from "./utils.js";
 
 const waitTimer = 20;
 const readyTimer = 10;
-
 export class WaitingRoom {
     constructor() {
         this.players = new Map();
