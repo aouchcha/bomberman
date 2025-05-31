@@ -221,24 +221,33 @@ input:focus {
   }
 }
 
-.player-count {
-  background-color: #4caf50;
-  color: white;
-  padding: 10px 20px;
-  font-size: 18px;
-  font-weight: bold;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: background-color 0.3s, transform 0.2s;
-  text-align: center;
-  user-select: none;
+.counter-display {
+    position: fixed;
+    top: 20px; 
+    left: 20px;
+    z-index: 1000;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px;
+    color: #4CAF50;
 }
 
-.player-count:hover {
-  background-color: #45a049;
-  transform: scale(1.05);
+.counter-container {
+    background: rgba(0, 0, 0, 0.85);
+    border: 2px solid #4CAF50;
+    border-radius: 5px;
+    padding: 8px 16px;
+    text-align: center;
+    transition: transform 0.2s ease-in-out;
+}
+
+.counter-container:hover {
+    transform: scale(1.05);
+    background: #4CAF50;
+    color: #000;
+}
+
+.counter-icon {
+    display: inline-block;
 }
 
 @media (max-width: 1500px) {

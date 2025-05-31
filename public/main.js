@@ -34,9 +34,6 @@ export function renderApp() {
                 ws.onclose = () => (
                     console.log("ws close"),
                     localStorage.removeItem("player")
-                    // setTimeout(() => {
-                    //     window.location.reload()
-                    // }, 5000)
                 )
                 setWait(false);
             } else {

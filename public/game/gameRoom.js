@@ -1,6 +1,6 @@
 import { movePlayer } from "./movePlayers.js";
 import { useState } from "../Apex/core.js";
-import { navigate, Routes } from "../Apex/router.js";
+import { Routes } from "../Apex/router.js";
 
 export let players = [];
 
@@ -12,8 +12,6 @@ export function ResetPlayers(ps) {
 
 export function updatePlayers(ps) {
     players = ps
-    // console.log(players);
-
 }
 export function gameRoom(tile, ws, setMap, setWait, setStart) {
 
@@ -41,18 +39,15 @@ export function gameRoom(tile, ws, setMap, setWait, setStart) {
 
     // Initialize players from tile map
     if (tile && players.length === 0) {
-
         tile.forEach((row, i) => {
             if (row) {
                 row.forEach((square, j) => {
 
                     // If the square contains a player ID
                     if (square !== "path" && square !== "brick" && square !== "wall" && square !== "bomb") {
-
                         // Check if this player doesn't exist in our state yet
                         if (!players.find(p => p.username === square)) {
-                            // x++
-                            // Add new      player to state
+                            // Add new player to state
                             const newPlayer = {
                                 position: {
                                     x: i,
@@ -70,29 +65,13 @@ export function gameRoom(tile, ws, setMap, setWait, setStart) {
                                 bombs: 6,
                             };
                             players.push(newPlayer);
-
-                            // Initialize myPlayer if this is the current user
-                            // if (square === localStorage.getItem("player")) {
-                            //     window.myPlayer = newPlayer;
-                            // }
                         }
                     }
-                    // else if (square.includes("bomb")) {
-                    //     bombs.push({
-                    //         position: {
-                    //             x: i,
-                    //             y: j,
-                    //         }
-                    //     })
-                    // }
                 });
             }
         });
 
     }
-    // console.log({ players });
-
-    // console.log(x);
     movePlayer(ws, updatePlayerState, setMap, setGameover, setWinner)
 
     return (
@@ -199,7 +178,6 @@ export function gameRoom(tile, ws, setMap, setWait, setStart) {
                                 {
                                     tag: "div",
                                     attrs: {
-                                        //src: "./assets/Effect_Explosion_1.gif",
                                         class: "path box",
                                     },
                                     children: [
@@ -218,7 +196,6 @@ export function gameRoom(tile, ws, setMap, setWait, setStart) {
                                 {
                                     tag: "div",
                                     attrs: {
-                                        //src: "./assets/Effect_Explosion_1.gif",
                                         class: "path box",
                                     },
                                     children: [
@@ -237,7 +214,6 @@ export function gameRoom(tile, ws, setMap, setWait, setStart) {
                                 {
                                     tag: "div",
                                     attrs: {
-                                        //src: "./assets/Effect_Explosion_1.gif",
                                         class: "path box",
                                     },
                                     children: [
@@ -256,7 +232,6 @@ export function gameRoom(tile, ws, setMap, setWait, setStart) {
                                 {
                                     tag: "div",
                                     attrs: {
-                                        //src: "./assets/Effect_Explosion_1.gif",
                                         class: "path box",
                                     },
                                     children: [
@@ -274,30 +249,6 @@ export function gameRoom(tile, ws, setMap, setWait, setStart) {
                         else {
                             if (!square.includes("bomb")) {
                                 const slice = square.split("-")
-                                // console.log({ SlPL: slice, Len: slice.length });
-
-                                // helper(slice)
-                                // if (slice.length == 2) {
-                                //     const player1 = players.find(p => p.id === slice[0]);
-                                //     const player2 = players.find(p => p.id === slice[1]);
-                                //     if (player1 && player2) {
-                                // slice.map((pl, i) => {
-                                //     const player = players.find(p => p.id === pl);
-                                //     console.log({ player });
-
-                                //     if (player) {
-                                //         console.log({ i });
-                                //         return {
-                                //             tag: "div",
-                                //             attrs: {
-                                //                 class: "path box",
-                                //             },
-                                //             children: [
-                                //                 createPlayer(player)
-                                //             ]
-                                //         }
-                                //     }
-                                // })
                                 return {
                                     tag: "div",
                                     attrs: {
@@ -306,10 +257,7 @@ export function gameRoom(tile, ws, setMap, setWait, setStart) {
                                     children: [
                                         ...slice.map((pl, i) => {
                                             const player = players.find(p => p.id === pl);
-                                            // console.log({ player });
-
                                             if (player) {
-                                                // console.log({ i });
                                                 return {
                                                     tag: "div",
                                                     attrs: {
@@ -323,47 +271,9 @@ export function gameRoom(tile, ws, setMap, setWait, setStart) {
                                         })
                                     ]
                                 }
-                                //     }
-                                // } else {
-                                //     const slice = square.split("-")
-                                //     console.log({slice});
-
-                                //     const player = players.find(p => p.id === square);
-                                //     if (player) {
-                                //         return {
-                                //             tag: "div",
-                                //             attrs: {
-                                //                 class: "path box",
-                                //             },
-                                //             children: [
-                                //                 createPlayer(player)
-                                //             ]
-                                //         }
-                                //     }
-                                // }
                             } else {
                                 const slice = square.split("-");
-                                // if (slice.length == 3) {
-                                //     const player1 = players.find(p => p.id === slice[1]);
-                                //     const player2 = players.find(p => p.id === slice[2]);
-                                //     if (player1 && player2) {
-                                //         return {
-                                //             tag: "div",
-                                //             attrs: {
-                                //                 class: "path box",
-                                //             },
-                                //             children: [
-                                //                 createBomb(i, j),
-                                //                 createPlayer(player1),
-                                //                 createPlayer(player2)
-                                //             ]
-                                //         }
-                                //     }
-                                // }
                                 if (slice.length > 1) {
-                                    // console.log({ SlBomb: slice.slice(1), Len: slice.slice(1).length });
-                                    // const player = players.find(p => p.id === slice[1]);
-                                    // if (player) {
                                     return {
                                         tag: "div",
                                         attrs: {
@@ -372,28 +282,22 @@ export function gameRoom(tile, ws, setMap, setWait, setStart) {
                                         children: [
                                             createBomb(i, j),
                                             ...slice.slice(1).map((pl, i) => {
-                                            const player = players.find(p => p.id === pl);
-                                            console.log({ player });
-
-                                            if (player) {
-                                                // console.log({ i });
-                                                return {
-                                                    tag: "div",
-                                                    attrs: {
-                                                        class: "path box",
-                                                    },
-                                                    children: [
-                                                        createPlayer(player)
-                                                    ]
+                                                const player = players.find(p => p.id === pl);
+                                                if (player) {
+                                                    return {
+                                                        tag: "div",
+                                                        attrs: {
+                                                            class: "path box",
+                                                        },
+                                                        children: [
+                                                            createPlayer(player)
+                                                        ]
+                                                    }
                                                 }
-                                            }
-                                        })
+                                            })
                                         ]
                                     }
-                                    // }
                                 } else {
-                                    console.log({ SlBomb: slice, Len: slice.length });
-
                                     return {
                                         tag: "div",
                                         attrs: {
@@ -415,39 +319,11 @@ export function gameRoom(tile, ws, setMap, setWait, setStart) {
     );
 }
 
-function helper(slice) {
-    slice.map((pl, i) => {
-        const player = players.find(p => p.id === pl);
-        console.log({ player });
-
-        if (player) {
-            console.log({ i });
-            return {
-                tag: "div",
-                attrs: {
-                    class: "path box",
-                },
-                children: [
-                    createPlayer(player)
-                ]
-            }
-        }
-    })
-}
-
 export function createPlayer(player) {
-    // let x = player.position.x;
-    // let y = player.position.y;
-    // if (first) {
-    //     first = false;
-    //     x = 5;
-    //     y = 5; 
-    // }
     return {
         tag: "div",
         attrs: {
             class: "Character",
-            // id: player.id,
             style: `top: ${player.position.x * 50}px; left: ${player.position.y * 50}px;
             transition: left ${player.speed}ms ease-out, top ${player.speed}ms ease-out;`,
         },
@@ -493,44 +369,6 @@ export function createBomb(x, y) {
     }
 
 }
-// export function createLivesDisplay(ws) {
-//     const [lives, setLives] = useState(0);
-
-//     ws.addEventListener("message", (event) => {
-//         const data = JSON.parse(event.data);
-//         if (data.type === "PlayerLives") {
-//             setLives(data.live);
-//         }
-//     });
-
-//     return {
-//         tag: "div",
-//         attrs: {
-//             class: "lives-display",
-//         },
-//         children: [
-//             {
-//                 tag: "div",
-//                 attrs: {
-//                     class: "lives-container",
-//                 },
-//                 children: [
-//                     {
-//                         tag: "span",
-//                         attrs: { class: "lives-icon" },
-//                         children: ["❤️"],
-//                     },
-//                     {
-//                         tag: "span",
-//                         attrs: { class: "lives-count" },
-//                         children: [String(lives)],
-//                     }
-//                 ]
-//             }
-//         ]
-//     }
-// }
-
 
 export function createBackgroundMusic() {
     return {

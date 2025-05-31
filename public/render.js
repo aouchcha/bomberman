@@ -5,26 +5,24 @@ import { useState } from './Apex/core.js';
 // Store the current message handler and chat history
 let currentMessageHandler = null;
 let gamestarted = false;
-let currUser;
 
 export function waitingRoom(ws, setWait) {
     const [timer, setTimer] = useState('Waiting...');
     const [chat, setChat] = useState([]);
     const [start, setStart] = useState(false);
     const [map, setMap] = useState();
+    const [playerCount, setPlayerCount] = useState(1);
 
     const manageMsgs = {
         timer: (data) => {
             setTimer(`Game starting in: ${data.time} seconds...`)
+            setPlayerCount(data.counter)
         },
         postCountdown: (data) => {
             setTimer(`Game starting very soon: ${data.time} seconds...`)
         },
         grid: (data) => {
-            console.log("map ==<", data.map)
-            console.log("ALGAAAAAAAAAAAAAAAAAa");
             if (data.players.length >= 2 && data.players.length <= 4) {
-
                 gamestarted = true;
                 ws.send(JSON.stringify({
                     type: "gamestarted",
@@ -40,30 +38,18 @@ export function waitingRoom(ws, setWait) {
             setTimer("Waiting for more players...")
         },
         chat: (data) => {
-            // if (!chat.includes(data.message)) {
             setChat((prev) => [...prev, data.message])
-            // }
         },
-
-        xxx: (data) => {
-            //alert(data)
-            console.log(data);
-        }
-
+        counter: (data) => {
+            console.log("Counter received:", data.counter);
+            setPlayerCount(data.counter);
+        },
     }
     if (currentMessageHandler) {
         ws.removeEventListener("message", currentMessageHandler);
     }
     currentMessageHandler = (e) => {
         const data = JSON.parse(e.data);
-        // if (data.type == "xxx") {
-        //     //console.log("OVEEEEEEEEEEEEEEEEEEEEEEEEEEEER");
-        //     // players.filter(player => {
-        //     //     player.username == data.username
-        //     // });
-        //     // updatePlayerState(players)
-        //     return;
-        // }
         const handler = manageMsgs[data.type];
         if (handler) {
             handler(data);
@@ -83,7 +69,28 @@ export function waitingRoom(ws, setWait) {
                     },
                     children: [timer]
                 },
-                Chat(chat, ws, start)
+                Chat(chat, ws, start),
+                {
+                    tag: "div",
+                    attrs: {
+                        class: "counter-display",
+                    },
+                    children: [
+                        {
+                            tag: "div",
+                            attrs: {
+                                class: "counter-container",
+                            },
+                            children: [
+                                {
+                                    tag: "span",
+                                    attrs: { class: "counter-icon" },
+                                    children: [`👥 Players: ${String(playerCount)} / 4`],
+                                }
+                            ],
+                        }
+                    ]
+                },
             ]
         } : {
             tag: "div",
