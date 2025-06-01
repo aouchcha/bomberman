@@ -82,17 +82,18 @@ export function waitingRoom(ws, setWait) {
             children: [
                 {
                     tag: "p",
-                    children: [`You Win The Game`]
+                    children: [`You Won`]
                 }, {
                     tag: "button",
                     attrs: {
+                        class: "restart-button",
                         onclick: () => {
                             setWait(true),
                                 setWinner(false),
                                 setStart(false)
                         }
                     },
-                    children: ['Restart The game']
+                    children: ['Restart']
                 }
             ]
         } : !start ? {

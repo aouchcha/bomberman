@@ -19,7 +19,7 @@ body {
   flex-direction: row-reverse;
   margin: 0;
   padding: 0;
-  background-image: url(./bg.jpg);
+  background-image: url(../images/bg.jpg);
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
@@ -52,7 +52,7 @@ body {
 .wall.box {
   height: 50px;
   width: 50px;
-  background-image: url(Bricks_01-128x128.png);
+  background-image: url(../images/Bricks_01-128x128.png);
   background-size: cover;
   z-index: 2;
 }
@@ -60,7 +60,7 @@ body {
 .path.box {
   height: 50px;
   width: 50px;
-  background-image: url(Texture_12_Diffuse.png);
+  background-image: url(../images/Texture_12_Diffuse.png);
 }
 
 .collision {
@@ -73,7 +73,7 @@ body {
 .brick {
   width: 50px;
   height: 50px;
-  background-image: url(Bricks_15-128x128.png);
+  background-image: url(../images/Bricks_15-128x128.png);
   background-size: cover;
 }
 
@@ -187,7 +187,9 @@ input:focus {
 }
 
 .message {
-  display: grid;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
   position: absolute;
   /* top: 0; */
   left: 0;
@@ -208,6 +210,19 @@ input:focus {
   text-align: center;
   align-items: center;
 }
+
+.restart-button {
+  width: 150px;
+  height: 70px;
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #4CAF50;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
 
 @keyframes pop {
   0% {

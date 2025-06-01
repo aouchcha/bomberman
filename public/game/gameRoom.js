@@ -72,9 +72,9 @@ export function gameRoom(tile, ws, setMap, setWait, setStart, winner, setWinner)
         });
 
     }
-//    window.requestAnimationFrame(
+    //    window.requestAnimationFrame(
     movePlayer(ws, updatePlayerState, setMap, setGameover, setWinner)
-// )
+    // )
 
     return (
         error ? {
@@ -97,10 +97,11 @@ export function gameRoom(tile, ws, setMap, setWait, setStart, winner, setWinner)
             children: [
                 {
                     tag: "p",
-                    children: [`You Lose The Game`]
+                    children: [`You Lost`]
                 }, {
                     tag: "button",
                     attrs: {
+                        class: "restart-button",
                         onclick: () => {
                             setWait(true),
                                 setGameover(false),
@@ -108,7 +109,7 @@ export function gameRoom(tile, ws, setMap, setWait, setStart, winner, setWinner)
                                 setStart(false)
                         }
                     },
-                    children: ['Restart The game']
+                    children: ['Restart']
                 }
             ]
         } : winner ? {
@@ -123,6 +124,7 @@ export function gameRoom(tile, ws, setMap, setWait, setStart, winner, setWinner)
                 }, {
                     tag: "button",
                     attrs: {
+                        class: "restart-button",
                         onclick: () => {
                             setWait(true),
                                 setGameover(false),
@@ -130,7 +132,7 @@ export function gameRoom(tile, ws, setMap, setWait, setStart, winner, setWinner)
                                 setStart(false)
                         }
                     },
-                    children: ['Restart The game']
+                    children: ['Restart']
                 }
             ]
         } : {
@@ -186,7 +188,7 @@ export function gameRoom(tile, ws, setMap, setWait, setStart, winner, setWinner)
                                         {
                                             tag: "img",
                                             attrs: {
-                                                src: "./assets/Effect_Explosion_1.gif",
+                                                src: "./assets/images/Effect_Explosion_1.gif",
                                                 class: "collision",
                                             }
                                         }
@@ -204,8 +206,8 @@ export function gameRoom(tile, ws, setMap, setWait, setStart, winner, setWinner)
                                         {
                                             tag: "img",
                                             attrs: {
-                                                src: "./assets/speed.png",
-                                                class: "collision",
+                                                src: "./assets/images/speed.png",
+                                                class: "powerup-orb speed",
                                             }
                                         }
                                     ]
@@ -222,8 +224,8 @@ export function gameRoom(tile, ws, setMap, setWait, setStart, winner, setWinner)
                                         {
                                             tag: "img",
                                             attrs: {
-                                                src: "./assets/range.png",
-                                                class: "collision",
+                                                src: "./assets/images/range.png",
+                                                class: "powerup-orb range",
                                             }
                                         }
                                     ]
@@ -240,8 +242,8 @@ export function gameRoom(tile, ws, setMap, setWait, setStart, winner, setWinner)
                                         {
                                             tag: "img",
                                             attrs: {
-                                                src: "./assets/extraBomb.png",
-                                                class: "collision",
+                                                src: "./assets/images/extraBomb.png",
+                                                class: "powerup-orb ExtraBomb",
                                             }
                                         }
                                     ]
@@ -341,7 +343,7 @@ export function createPlayer(player) {
                 tag: "img",
                 attrs: {
                     class: `Character_spritesheet pixelart face-${player.direction}-move`,
-                    src: "assets/redLink.png",
+                    src: "assets/images/redLink.png",
                     alt: "Character",
                 }
             }
@@ -363,7 +365,7 @@ export function createBomb(x, y) {
                 tag: "img",
                 attrs: {
                     class: "bomber_spritesheet pixelart",
-                    src: "assets/bomb.png",
+                    src: "assets/images/bomb.png",
                     alt: "Bomb"
                 }
             }
