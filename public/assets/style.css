@@ -19,7 +19,7 @@ body {
   flex-direction: row-reverse;
   margin: 0;
   padding: 0;
-  background-image: url(./background.png);
+  background-image: url(./bg.jpg);
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
@@ -222,32 +222,32 @@ input:focus {
 }
 
 .counter-display {
-    position: fixed;
-    top: 20px; 
-    left: 20px;
-    z-index: 1000;
-    font-family: 'Press Start 2P', monospace;
-    font-size: 10px;
-    color: #4CAF50;
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  color: #4CAF50;
 }
 
 .counter-container {
-    background: rgba(0, 0, 0, 0.85);
-    border: 2px solid #4CAF50;
-    border-radius: 5px;
-    padding: 8px 16px;
-    text-align: center;
-    transition: transform 0.2s ease-in-out;
+  background: rgba(0, 0, 0, 0.85);
+  border: 2px solid #4CAF50;
+  border-radius: 5px;
+  padding: 8px 16px;
+  text-align: center;
+  transition: transform 0.2s ease-in-out;
 }
 
 .counter-container:hover {
-    transform: scale(1.05);
-    background: #4CAF50;
-    color: #000;
+  transform: scale(1.05);
+  background: #4CAF50;
+  color: #000;
 }
 
 .counter-icon {
-    display: inline-block;
+  display: inline-block;
 }
 
 @media (max-width: 1500px) {

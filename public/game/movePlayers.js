@@ -27,109 +27,109 @@ function movingPlayerAnimation() {
 }
 
 export function movePlayer(ws, updatePlayerState, setMap, setGameover, setWinner) {
-    requestAnimationFrame(() => {
-        ws.onmessage = (event) => {
-            if (localStorage.getItem('player') === undefined) {
-                movingPlayerAnimation();
+    // requestAnimationFrame(() => {
+    ws.onmessage = (event) => {
+        if (localStorage.getItem('player') === undefined) {
+            movingPlayerAnimation();
+            ws.send(JSON.stringify({
+                type: "lose",
+                myplayer: myPlayer
+            }))
+            return
+        }
+        const data = JSON.parse(event.data);
+        if (data.type == "gameover") {
+            ws.close();
+            updatePlayers([])
+            setMap([])
+            setWinner(true)
+            return;
+        }
+        if (data.type === "mouvement") {
+            players.forEach(player => {
+                if (player.id == data.id) {
+                    player.position = data.position;
+                    player.direction = data.direction;
+                }
+                updatePlayerState(data.players)
+
+            });
+            updatePlayers(data.players);
+        }
+        else if (data.type === "self-update") {
+            myPlayer.position = data.position;
+            myPlayer.direction = data.direction;
+
+            updatePlayerState(data.myplayer)
+            updatePlayers(data.players);
+        }
+        else if (data.type === "bombPlaced") {
+            setMap(data.grid)
+        }
+        else if (data.type === "bombExploded") {
+            ws.send(JSON.stringify({
+                type: 'test',
+                bomb: true,
+                players: players,
+                bombCorrds: data.position,
+                myplayer: data.myplayer,
+            }));
+        } else if (data.type == "expo") {
+
+            updatePlayers(data.players);
+            movingPlayerAnimation()
+
+            if (myPlayer.lives == 0) {
                 ws.send(JSON.stringify({
                     type: "lose",
                     myplayer: myPlayer
                 }))
-                return
             }
-            const data = JSON.parse(event.data);
-            if (data.type == "gameover") {
-                ws.close();
-                updatePlayers([])
-                setMap([])
-                setWinner(true)
-                return;
-            }
-            if (data.type === "mouvement") {
-                players.forEach(player => {
-                    if (player.id == data.id) {
-                        player.position = data.position;
-                        player.direction = data.direction;
-                    }
-                    updatePlayerState(data.players)
-
-                });
-                updatePlayers(data.players);
-            }
-            else if (data.type === "self-update") {
-                myPlayer.position = data.position;
-                myPlayer.direction = data.direction;
-
-                updatePlayerState(data.myplayer)
-                updatePlayers(data.players);
-            }
-            else if (data.type === "bombPlaced") {
-                setMap(data.grid)
-            }
-            else if (data.type === "bombExploded") {
+            ResetPlayers(data.players)
+            if (players.length == 1) {
                 ws.send(JSON.stringify({
-                    type: 'test',
-                    bomb: true,
-                    players: players,
-                    bombCorrds: data.position,
-                    myplayer: data.myplayer,
-                }));
-            } else if (data.type == "expo") {
-
-                updatePlayers(data.players);
-                movingPlayerAnimation()
-
-                if (myPlayer.lives == 0) {
-                    ws.send(JSON.stringify({
-                        type: "lose",
-                        myplayer: myPlayer
-                    }))
-                }
-                ResetPlayers(data.players)
-                if (players.length == 1) {
-                    ws.send(JSON.stringify({
-                        type: "win",
-                        myplayer: myPlayer
-                    }))
-                }
-                setMap(data.grid);
-            } else if (data.type === "after_expo1") {
-                movingPlayerAnimation(' ', ' ', directions.keySpace);
-                ws.send(JSON.stringify({
-                    type: 'after_expo2',
-                    players: players,
+                    type: "win",
                     myplayer: myPlayer
-                }));
+                }))
+            }
+            setMap(data.grid);
+        } else if (data.type === "after_expo1") {
+            movingPlayerAnimation(' ', ' ', directions.keySpace);
+            ws.send(JSON.stringify({
+                type: 'after_expo2',
+                players: players,
+                myplayer: myPlayer
+            }));
 
-            } else if (data.type === "newgrid") {
-                updatePlayers(data.players);
-                setMap(data.grid);
-            }
-            else if (data.type === "powerUpCollected") {
-                ws.send(JSON.stringify({
-                    type: 'powerUpCollected',
-                    players: players,
-                    myplayer: myPlayer
-                }));
-                updatePlayers(data.players);
-            }
-            else if (data.type === "powerUpCollected2") {
-                updatePlayers(data.players);
-                setMap(data.grid);
-            } else if (data.type == "lose") {
-                ws.close();
-                updatePlayers([])
-                setMap([])
-                setGameover(true)
-            } else if (data.type == "win") {
-                ws.close();
-                updatePlayers([])
-                setMap([])
-                setWinner(true)
-            }
-
+        } else if (data.type === "newgrid") {
+            updatePlayers(data.players);
+            setMap(data.grid);
         }
-    });
+        else if (data.type === "powerUpCollected") {
+            ws.send(JSON.stringify({
+                type: 'powerUpCollected',
+                players: players,
+                myplayer: myPlayer
+            }));
+            updatePlayers(data.players);
+        }
+        else if (data.type === "powerUpCollected2") {
+            updatePlayers(data.players);
+            setMap(data.grid);
+        } else if (data.type == "lose") {
+            ws.close();
+            updatePlayers([])
+            setMap([])
+            setGameover(true)
+        } else if (data.type == "win") {
+            ws.close();
+            updatePlayers([])
+            setMap([])
+            setWinner(true)
+        }
+
+    }
+    // });
 
     document.onkeyup = (event) => {
         // if (move) {
