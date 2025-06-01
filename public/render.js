@@ -20,13 +20,11 @@ export function waitingRoom(ws, setWait) {
                 setTimer(`Game starting in: ${data.time} seconds...`)
                 setPlayerCount(data.counter)
             })
-            // setTimer(`Game starting in: ${data.time} seconds...`)
         },
         postCountdown: (data) => {
             requestAnimationFrame(() => {
                 setTimer(`Game starting very soon: ${data.time} seconds...`)
             })
-            // setTimer(`Game starting very soon: ${data.time} seconds...`)
         },
         grid: (data) => {
             if (data.players.length >= 2 && data.players.length <= 4) {
@@ -38,20 +36,18 @@ export function waitingRoom(ws, setWait) {
                 setMap(data.map)
                 setStart(true)
             } else {
-                console.log("The time allowed for new players to enter has passed.");
+                alert("The time allowed for new players to enter has passed.");
             }
         },
         waiting: () => {
             requestAnimationFrame(() => {
                 setTimer("Waiting for more players...")
             })
-            // setTimer("Waiting for more players...")
         },
         chat: (data) => {
             setChat((prev) => [...prev, data.message])
         },
         counter: (data) => {
-            //console.log("Counter received:", data.counter);
             setPlayerCount(data.counter);
         },
         gameover: () => {

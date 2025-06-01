@@ -12,9 +12,6 @@ const directions = {
 }
 
 
-// export let move = false;
-
-// let playerElement
 function movingPlayerAnimation() {
     if (players.length > 0) {
         players.forEach(player => {
@@ -27,7 +24,6 @@ function movingPlayerAnimation() {
 }
 
 export function movePlayer(ws, updatePlayerState, setMap, setGameover, setWinner) {
-    // requestAnimationFrame(() => {
     ws.onmessage = (event) => {
         if (localStorage.getItem('player') === undefined) {
             movingPlayerAnimation();
@@ -71,7 +67,6 @@ export function movePlayer(ws, updatePlayerState, setMap, setGameover, setWinner
             ws.send(JSON.stringify({
                 type: 'test',
                 bomb: true,
-                duration: 1000,
                 players: players,
                 bombCorrds: data.position,
                 myplayer: data.myplayer,
@@ -96,7 +91,7 @@ export function movePlayer(ws, updatePlayerState, setMap, setGameover, setWinner
             }
             setMap(data.grid);
         } else if (data.type === "after_expo1") {
-            movingPlayerAnimation(' ', ' ', directions.keySpace);
+            movingPlayerAnimation();
             ws.send(JSON.stringify({
                 type: 'after_expo2',
                 players: players,
@@ -131,17 +126,15 @@ export function movePlayer(ws, updatePlayerState, setMap, setGameover, setWinner
         }
 
     }
-    // });
+
 
     document.onkeyup = (event) => {
-        // if (move) {
-        // const currentTime = Date.now();
-        // const requiredDelay = 16.67;
+
         switch (event.key) {
             case 'ArrowUp':
-                //  move = false
-                // if (currentTime - LastMvmt >= requiredDelay) {
-                movingPlayerAnimation(event.key, event.key, directions.keyUp);
+
+
+                movingPlayerAnimation();
                 ws.send(JSON.stringify({
                     type: 'move',
                     direction: directions.keyUp,
@@ -151,14 +144,14 @@ export function movePlayer(ws, updatePlayerState, setMap, setGameover, setWinner
                     myplayer: myPlayer,
                     players: players
                 }));
-                // }
-                // LastMvmt = currentTime;
+
+
                 break;
             case 'ArrowLeft':
-                //  move = false
-                // if (currentTime - LastMvmt >= requiredDelay) {
 
-                movingPlayerAnimation(event.key, event.key, directions.keyLeft);
+
+
+                movingPlayerAnimation();
                 ws.send(JSON.stringify({
                     type: 'move',
                     direction: directions.keyLeft,
@@ -168,14 +161,14 @@ export function movePlayer(ws, updatePlayerState, setMap, setGameover, setWinner
                     myplayer: myPlayer,
                     players: players
                 }));
-                // }
-                // LastMvmt = currentTime;
+
+
                 break;
             case 'ArrowDown':
-                //  move = false
-                // if (currentTime - LastMvmt >= requiredDelay) {
 
-                movingPlayerAnimation(event.key, event.key, directions.keyDown);
+
+
+                movingPlayerAnimation();
                 ws.send(JSON.stringify({
                     type: 'move',
                     direction: directions.keyDown,
@@ -185,13 +178,13 @@ export function movePlayer(ws, updatePlayerState, setMap, setGameover, setWinner
                     myplayer: myPlayer,
                     players: players
                 }));
-                // }
-                // LastMvmt = currentTime;
+
+
                 break;
             case 'ArrowRight':
-                //  move = false
-                // if (currentTime - LastMvmt >= requiredDelay) {
-                movingPlayerAnimation(event.key, event.key, directions.keyRight);
+
+
+                movingPlayerAnimation();
                 ws.send(JSON.stringify({
                     type: 'move',
                     direction: directions.keyRight,
@@ -201,27 +194,26 @@ export function movePlayer(ws, updatePlayerState, setMap, setGameover, setWinner
                     myplayer: myPlayer,
                     players: players
                 }));
-                // }
-                // LastMvmt = currentTime;
+
+
                 break;
             case ' ':
-                //  move = false
-                movingPlayerAnimation(event.key, event.key, directions.keySpace);
+
+                movingPlayerAnimation();
                 bombing(ws, myPlayer)
                 break;
         }
-        // };
+
     }
 
-    // document.onkeydown = (event) => {
-    //     if (event.key === 'ArrowUp' ||event.key === 'ArrowLeft'||event.key === 'ArrowDown'||event.key === 'ArrowRight' || event.key === ' ') {
-    //         move = true
-    //     }
-    // }
+
+
+
+
+
 }
 
 let lastBombTime = 0;
-let LastMvmt = 0
 let Time_Between_Bombs = 5;
 
 function bombing(ws, myplayer) {
@@ -229,7 +221,7 @@ function bombing(ws, myplayer) {
     const requiredDelay = Time_Between_Bombs * 1000;
 
     if (currentTime - lastBombTime >= requiredDelay) {
-        movingPlayerAnimation(' ', ' ', directions.keySpace);
+        movingPlayerAnimation();
 
         if (myplayer) {
             Time_Between_Bombs = myplayer.bombs;

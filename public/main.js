@@ -1,18 +1,15 @@
 // Frontend controller: HTTP + WS logic
 import { useState } from "./Apex/core.js";
 import { waitingRoom } from "./render.js";
-import { players } from "./game/gameRoom.js";
 
 let ws
 
 export function renderApp() {
     const [username, setUsername] = useState("")
     const [wait, setWait] = useState(true)
-    const [nbr, setNbr] = useState(0);
-
 
     async function checkUserName(e) {
-        if (username.trim().length == 0) return
+        if (username.trim().length == 0 || username.trim().length > 6) return
         if (e.key == 'Enter') {
             if (localStorage.getItem("player") != undefined) {
                 console.log("already there is a player");
@@ -54,7 +51,6 @@ export function renderApp() {
     }
 
     return (
-        //
         wait ? {
             tag: "div",
             attrs: {
@@ -63,7 +59,7 @@ export function renderApp() {
             children: [
                 {
                     tag: "h2",
-                    children: ["Welcome!"],
+                    children: ["Welcome, please enter a username less than 7 letters.."],
                 },
                 {
                     tag: "input",
@@ -71,9 +67,8 @@ export function renderApp() {
                         type: "text",
                         name: "username",
                         value: username,
-                        placeholder: "Enter username",
+                        placeholder: "Enter username...",
                         autofocus: 'autofocus',
-                        // style: wait ? "display:flex" : "display:none",
                         oninput: (e) => {
                             setUsername(e.target.value)
                         },

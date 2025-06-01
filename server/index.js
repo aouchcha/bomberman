@@ -120,14 +120,6 @@ wss.on("connection", (ws, req) => {
                     }
                 }
             }
-            // players.forEach(pl => {
-
-            //     if (grid[pl.position.x][pl.position.y] == "path") {
-            //         // grid[pl.position.x][pl.position.y] = pl.id;
-            //     } else if (grid[pl.position.x][pl.position.y].includes("bomb")) {
-            //         // grid[pl.position.x][pl.position.y] += `-${pl.id}`
-            //     }
-            // });
 
             ws.send(JSON.stringify({
                 type: "self-update",
@@ -167,16 +159,6 @@ wss.on("connection", (ws, req) => {
                 }
             }
 
-            // Update player positions
-            // data.players.forEach(pl => {
-            //     if (pl.id != data.username) {
-            //         if (grid[pl.position.x][pl.position.y] == "path") {
-            //             grid[pl.position.x][pl.position.y] = pl.id;
-            //         } else if (grid[pl.position.x][pl.position.y].includes("bomb")) {
-            //             grid[bombPosition.x][bombPosition.y] += `-${pl.id}`
-            //         }
-            //     }
-            // });
             for (const [_, value] of waitingRoom.players.entries()) {
                 value.send(JSON.stringify({
                     type: "bombPlaced",
@@ -195,7 +177,7 @@ wss.on("connection", (ws, req) => {
                         myplayer: data.myplayer
                     }));
                 }
-            }, 5000);
+            }, 3000);
         } else if (data.type === "test") {
             // Generate coordinates for each direction based on range
             const range = data.myplayer.range || 1;
@@ -237,7 +219,7 @@ wss.on("connection", (ws, req) => {
                 // Only affect positions within grid bounds
                 if (pos.x < tile.height && pos.x > 0 && pos.y < tile.width && pos.y > 0) {
                     if (grid[pos.x][pos.y] === "brick" || grid[pos.x][pos.y] === "path") {
-                        if (grid[pos.x][pos.y] === "brick") {
+                        if (grid[pos.x][pos.y] === "brick" && Math.random() < 0.5) {
                             const types = [POWERUP_TYPES.SPEED, POWERUP_TYPES.RANGE, POWERUP_TYPES.EXTRABOMB];
                             const type = types[Math.floor(Math.random() * types.length)];
                             powerUps.set(`${pos.x},${pos.y}`, type);
@@ -278,13 +260,12 @@ wss.on("connection", (ws, req) => {
             }
 
             setTimeout(() => {
-                console.log("data explosion ===>", data)
                 for (const [key, value] of waitingRoom.players.entries()) {
                     value.send(JSON.stringify({
                         type: "after_expo1",
                     }));
                 }
-            }, data.duration);
+            }, 1000);
         } else if (data.type == "after_expo2") {
             for (let i = 0; i < grid.length; i++) {
                 for (let j = 0; j < grid[i].length; j++) {
@@ -293,13 +274,6 @@ wss.on("connection", (ws, req) => {
                     }
                 }
             }
-            // data.players.forEach(pl => {
-            //     if (grid[pl.position.x][pl.position.y] == "path") {
-            //         // grid[pl.position.x][pl.position.y] = pl.id;
-            //     } else {
-            //         // grid[pl.position.x][pl.position.y] += `-${pl.id}`
-            //     }
-            // });
 
             powerUps.forEach((key, value) => {
                 const coords = value.split(',')
@@ -364,7 +338,6 @@ wss.on("connection", (ws, req) => {
         setLength.len = playersUsernames.size;
 
         if (waitingRoom.players.size === 1) {
-            //console.log("hanni");
 
             for (let i = 0; i < grid.length; i++) {
                 for (let j = 0; j < grid[i].length; j++) {
@@ -430,13 +403,13 @@ function updatePosition(direction, position, myplayer, players) {
                 players.forEach((p) => {
                     if (p.id == myplayer.id && p.speed > 100) {
                         grid[position.x][position.y] = "path";
-                        p.speed -= 50;
+                        p.speed -= 100;
                     }
                 })
                 break;
             case 'ExtraBomb':
                 players.forEach((p) => {
-                    if (p.id == myplayer.id && p.bombs > 0) {
+                    if (p.id == myplayer.id && p.bombs > 2) {
                         grid[position.x][position.y] = "path";
                         p.bombs -= 1;
                     }

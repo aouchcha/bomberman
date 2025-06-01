@@ -55,7 +55,7 @@ export function isEmpty(row, cell, tile) {
     return false;
 }
 
-const BRICKS_NUMBER = 0;
+const BRICKS_NUMBER = 50;
 export function addBricksToBoard(map) {
     let i = 0;
     let tileMap = map
@@ -63,7 +63,7 @@ export function addBricksToBoard(map) {
     while (i < BRICKS_NUMBER) {
         let row = Math.floor(Math.random() * tileMap.length);
         let cell = Math.floor(Math.random() * tileMap[0].length);
-
+        
         if (isEmpty(row, cell, tileMap)) {
             tileMap[row][cell] = "brick";
             i++;

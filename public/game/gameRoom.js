@@ -3,7 +3,7 @@ import { useState } from "../Apex/core.js";
 import { Routes } from "../Apex/router.js";
 
 export let players = [];
-// export let move = false;
+
 export function ResetPlayers(ps) {
     players = ps.filter((pl) => {
         return pl.lives > 0
@@ -37,17 +37,17 @@ export function gameRoom(tile, ws, setMap, setWait, setStart, winner, setWinner)
         }));
     };
 
-    // Initialize players from tile map
+
     if (tile && players.length === 0) {
         tile.forEach((row, i) => {
             if (row) {
                 row.forEach((square, j) => {
 
-                    // If the square contains a player ID
+
                     if (square !== "path" && square !== "brick" && square !== "wall" && square !== "bomb") {
-                        // Check if this player doesn't exist in our state yet
+
                         if (!players.find(p => p.username === square)) {
-                            // Add new player to state
+
                             const newPlayer = {
                                 position: {
                                     x: i,
@@ -61,9 +61,9 @@ export function gameRoom(tile, ws, setMap, setWait, setStart, winner, setWinner)
                                 direction: "down",
                                 lives: 3,
                                 range: 1,
-                                speed: 250,
-                                bombs: 3,
-                                exp_duration: 1000,
+                                speed: 500,
+                                bombs: 5,
+
                             };
                             players.push(newPlayer);
                         }
@@ -73,9 +73,8 @@ export function gameRoom(tile, ws, setMap, setWait, setStart, winner, setWinner)
         });
 
     }
-    //    window.requestAnimationFrame(
+
     movePlayer(ws, updatePlayerState, setMap, setGameover, setWinner)
-    // )
 
     return (
         error ? {
@@ -142,18 +141,18 @@ export function gameRoom(tile, ws, setMap, setWait, setStart, winner, setWinner)
                 class: "container",
             },
             children: [
-                // Render players
+
                 ...players.map((p) => (
-                    // tag: "div",
-                    // attrs: {
-                    // class: "path box",
-                    // },
-                    // children: [
+
+
+
+
+
                     createPlayer(p)
-                    // ]
+
                 )),
 
-                // Render the grid
+
                 ...(tile ? tile.map((row, i) => ({
                     tag: "div",
                     attrs: {
@@ -162,7 +161,7 @@ export function gameRoom(tile, ws, setMap, setWait, setStart, winner, setWinner)
                     children: row ? row.map((square, j) => {
                         const squareType = `${square}`;
 
-                        // Handle bomb tiles
+
                         if (squareType === "bomb") {
                             return {
 
@@ -176,7 +175,7 @@ export function gameRoom(tile, ws, setMap, setWait, setStart, winner, setWinner)
                             }
                         }
 
-                        // Handle path tiles
+
                         if (squareType === "path") {
                             return {
                                 tag: "div",
@@ -187,7 +186,7 @@ export function gameRoom(tile, ws, setMap, setWait, setStart, winner, setWinner)
                             };
                         }
 
-                        // Handle brick tiles
+
                         if (squareType === "brick") {
                             return {
                                 tag: "div",
@@ -198,7 +197,7 @@ export function gameRoom(tile, ws, setMap, setWait, setStart, winner, setWinner)
                             };
                         }
 
-                        // Handle wall tiles
+
                         if (squareType === "wall") {
                             return {
                                 tag: "div",
@@ -209,7 +208,7 @@ export function gameRoom(tile, ws, setMap, setWait, setStart, winner, setWinner)
                             };
                         }
 
-                        // Handle collision/explosion tiles
+
                         if (squareType === "collision") {
                             return {
                                 tag: "div",
@@ -228,7 +227,7 @@ export function gameRoom(tile, ws, setMap, setWait, setStart, winner, setWinner)
                             };
                         }
 
-                        // Handle speed powerup
+
                         if (squareType === "speed") {
                             return {
                                 tag: "div",
@@ -247,7 +246,7 @@ export function gameRoom(tile, ws, setMap, setWait, setStart, winner, setWinner)
                             };
                         }
 
-                        // Handle range powerup
+
                         if (squareType === "range") {
                             return {
                                 tag: "div",
@@ -266,7 +265,7 @@ export function gameRoom(tile, ws, setMap, setWait, setStart, winner, setWinner)
                             };
                         }
 
-                        // Handle extra bomb powerup
+
                         if (squareType === "ExtraBomb") {
                             return {
                                 tag: "div",
@@ -285,7 +284,7 @@ export function gameRoom(tile, ws, setMap, setWait, setStart, winner, setWinner)
                             };
                         }
 
-                        // Default case - return empty div or null
+
                         return {
                             tag: "div",
                             attrs: {
@@ -302,7 +301,6 @@ export function gameRoom(tile, ws, setMap, setWait, setStart, winner, setWinner)
 }
 
 export function createPlayer(player) {
-    console.log({ player });
 
     return {
         tag: "div",
@@ -312,6 +310,13 @@ export function createPlayer(player) {
             transition: left ${player.speed}ms ease-out, top ${player.speed}ms ease-out;`,
         },
         children: [
+            {
+                tag: "p",
+                attrs: {
+                    class: "uid"
+                },
+                children: [`${player.id}`]
+            },
             {
                 tag: "p",
                 attrs: {
