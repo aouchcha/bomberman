@@ -51,7 +51,7 @@ export function waitingRoom(ws, setWait) {
             setChat((prev) => [...prev, data.message])
         },
         counter: (data) => {
-            console.log("Counter received:", data.counter);
+            //console.log("Counter received:", data.counter);
             setPlayerCount(data.counter);
         },
         gameover: () => {

@@ -361,7 +361,7 @@ wss.on("connection", (ws, req) => {
         setLength.len = playersUsernames.size;
 
         if (waitingRoom.players.size === 1) {
-        console.log("hanni");
+        //console.log("hanni");
 
             for (let i = 0; i < grid.length; i++) {
                 for (let j = 0; j < grid[i].length; j++) {
