@@ -12,11 +12,27 @@ body {
   overflow: hidden;
 }
 
+/* 
 .root {
   height: 100%;
   width: 100%;
   display: flex;
   flex-direction: row-reverse;
+  margin: 0;
+  padding: 0;
+  background-image: url(../images/bg.jpg);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  position: relative;
+  overflow-y: scroll;
+} */
+.root {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  /* flex-direction: row-reverse; */
+  justify-content: center;
   margin: 0;
   padding: 0;
   background-image: url(../images/bg.jpg);
