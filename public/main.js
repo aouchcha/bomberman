@@ -31,7 +31,7 @@ export function renderApp() {
             const result = await response.json();
             if (response.ok) {
                 localStorage.setItem("player", username)
-                ws = new WebSocket(`ws://localhost:8080?username=${result.message}`);
+                ws = new WebSocket(`ws://10.1.2.6:8080?username=${result.message}`);
                 ws.onopen = () => {
                     console.log("were connected");
                 };

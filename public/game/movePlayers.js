@@ -64,6 +64,7 @@ export function movePlayer(ws, updatePlayerState, setMap, setGameover, setWinner
             updatePlayers(data.players);
         }
         else if (data.type === "bombPlaced") {
+            updatePlayers(data.players)
             setMap(data.grid)
         }
         else if (data.type === "bombExploded") {

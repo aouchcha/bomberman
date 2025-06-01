@@ -9,6 +9,7 @@ import { joining, playersUsernames, setLength } from './playerManager.js';
 import { tile } from './game/tile.js';
 import { addBricksToBoard, checkSomething } from "./utils.js"
 import { WaitingRoom } from './waitingRoom.js';
+// import { players } from '../public/game/gameRoom.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -114,19 +115,19 @@ wss.on("connection", (ws, req) => {
 
             for (let i = 0; i < grid.length; i++) {
                 for (let j = 0; j < grid[i].length; j++) {
-                    if (grid[i][j] !== "brick" && grid[i][j] !== "wall" && !grid[i][j].includes("bomb-") && !powerUps.has(`${i},${j}`)) {
+                    if (grid[i][j] !== "brick" && grid[i][j] !== "wall" && !grid[i][j].includes("bomb") && !powerUps.has(`${i},${j}`)) {
                         grid[i][j] = "path";
                     }
                 }
             }
-            players.forEach(pl => {
+            // players.forEach(pl => {
 
-                if (grid[pl.position.x][pl.position.y] == "path") {
-                    grid[pl.position.x][pl.position.y] = pl.id;
-                } else if (grid[pl.position.x][pl.position.y].includes("bomb")) {
-                    grid[pl.position.x][pl.position.y] += `-${pl.id}`
-                }
-            });
+            //     if (grid[pl.position.x][pl.position.y] == "path") {
+            //         // grid[pl.position.x][pl.position.y] = pl.id;
+            //     } else if (grid[pl.position.x][pl.position.y].includes("bomb")) {
+            //         // grid[pl.position.x][pl.position.y] += `-${pl.id}`
+            //     }
+            // });
 
             ws.send(JSON.stringify({
                 type: "self-update",
@@ -155,31 +156,32 @@ wss.on("connection", (ws, req) => {
 
         if (data.type == "bombPlaced") {
             const bombPosition = { ...data.position };
-            grid[bombPosition.x][bombPosition.y] = `bomb-${data.username}`;
+            grid[bombPosition.x][bombPosition.y] = `bomb`;
 
             // Reset non-wall/brick tiles to path
             for (let i = 0; i < grid.length; i++) {
                 for (let j = 0; j < grid[i].length; j++) {
-                    if (grid[i][j] !== "brick" && grid[i][j] !== "wall" && !grid[i][j].includes("bomb-") && !powerUps.has(`${i},${j}`)) {
+                    if (grid[i][j] !== "brick" && grid[i][j] !== "wall" && !grid[i][j].includes("bomb") && !powerUps.has(`${i},${j}`)) {
                         grid[i][j] = "path";
                     }
                 }
             }
 
             // Update player positions
-            data.players.forEach(pl => {
-                if (pl.id != data.username) {
-                    if (grid[pl.position.x][pl.position.y] == "path") {
-                        grid[pl.position.x][pl.position.y] = pl.id;
-                    } else if (grid[pl.position.x][pl.position.y].includes("bomb")) {
-                        grid[bombPosition.x][bombPosition.y] += `-${pl.id}`
-                    }
-                }
-            });
+            // data.players.forEach(pl => {
+            //     if (pl.id != data.username) {
+            //         if (grid[pl.position.x][pl.position.y] == "path") {
+            //             grid[pl.position.x][pl.position.y] = pl.id;
+            //         } else if (grid[pl.position.x][pl.position.y].includes("bomb")) {
+            //             grid[bombPosition.x][bombPosition.y] += `-${pl.id}`
+            //         }
+            //     }
+            // });
             for (const [_, value] of waitingRoom.players.entries()) {
                 value.send(JSON.stringify({
                     type: "bombPlaced",
                     grid: grid,
+                    players: data.players
                 }));
             }
             setTimeout(() => {
@@ -259,7 +261,7 @@ wss.on("connection", (ws, req) => {
                     }
                 })
                 if (pl.lives > 0) {
-                    grid[pl.position.x][pl.position.y] = pl.id
+                    // grid[pl.position.x][pl.position.y] = pl.id
                 } else {
                     grid[pl.position.x][pl.position.y] = "path"
                 }
@@ -290,13 +292,13 @@ wss.on("connection", (ws, req) => {
                     }
                 }
             }
-            data.players.forEach(pl => {
-                if (grid[pl.position.x][pl.position.y] == "path") {
-                    grid[pl.position.x][pl.position.y] = pl.id;
-                } else {
-                    grid[pl.position.x][pl.position.y] += `-${pl.id}`
-                }
-            });
+            // data.players.forEach(pl => {
+            //     if (grid[pl.position.x][pl.position.y] == "path") {
+            //         // grid[pl.position.x][pl.position.y] = pl.id;
+            //     } else {
+            //         // grid[pl.position.x][pl.position.y] += `-${pl.id}`
+            //     }
+            // });
 
             powerUps.forEach((key, value) => {
                 const coords = value.split(',')
@@ -339,7 +341,7 @@ wss.on("connection", (ws, req) => {
     })
 
     ws.on("close", () => {
-        
+
         let userid;
 
         for (const [key, value] of waitingRoom.players.entries()) {
@@ -361,7 +363,7 @@ wss.on("connection", (ws, req) => {
         setLength.len = playersUsernames.size;
 
         if (waitingRoom.players.size === 1) {
-        //console.log("hanni");
+            //console.log("hanni");
 
             for (let i = 0; i < grid.length; i++) {
                 for (let j = 0; j < grid[i].length; j++) {
@@ -461,7 +463,7 @@ function Obstacles(position, direction) {
     const nextX = position.y + (direction === 'right' ? 1 : direction === 'left' ? -1 : 0);
     const nextY = position.x + (direction === 'down' ? 1 : direction === 'up' ? -1 : 0);
 
-    if ((!grid[nextY][nextX] || grid[nextY][nextX] == "bomb" || grid[nextY][nextX] == "wall" || grid[nextY][nextX] == "brick" || grid[nextY][nextX].includes("bomb"))) {
+    if ((!grid[nextY][nextX] || grid[nextY][nextX] == "bomb" || grid[nextY][nextX] == "wall" || grid[nextY][nextX] == "brick")) {
         return false;
     }
     return true;

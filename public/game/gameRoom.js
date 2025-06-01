@@ -62,7 +62,7 @@ export function gameRoom(tile, ws, setMap, setWait, setStart, winner, setWinner)
                                 lives: 3,
                                 range: 1,
                                 speed: 250,
-                                bombs: 6,
+                                bombs: 3,
                             };
                             players.push(newPlayer);
                         }
@@ -141,6 +141,17 @@ export function gameRoom(tile, ws, setMap, setWait, setStart, winner, setWinner)
                 class: "container",
             },
             children: [
+                // Render players
+                ...players.map((p) => (
+                    // tag: "div",
+                    // attrs: {
+                    // class: "path box",
+                    // },
+                    // children: [
+                    createPlayer(p)
+                    // ]
+                )),
+
                 // Render the grid
                 ...(tile ? tile.map((row, i) => ({
                     tag: "div",
@@ -148,8 +159,24 @@ export function gameRoom(tile, ws, setMap, setWait, setStart, winner, setWinner)
                         class: "row",
                     },
                     children: row ? row.map((square, j) => {
-                        // Render path tiles
-                        if (`${square}` === "path") {
+                        const squareType = `${square}`;
+
+                        // Handle bomb tiles
+                        if (squareType === "bomb") {
+                            return {
+
+                                tag: "div",
+                                attrs: {
+                                    class: "path box",
+                                },
+                                children: [
+                                    createBomb(i, j)
+                                ]
+                            }
+                        }
+
+                        // Handle path tiles
+                        if (squareType === "path") {
                             return {
                                 tag: "div",
                                 attrs: {
@@ -158,8 +185,9 @@ export function gameRoom(tile, ws, setMap, setWait, setStart, winner, setWinner)
                                 }
                             };
                         }
-                        // Render brick tiles
-                        else if (`${square}` === "brick") {
+
+                        // Handle brick tiles
+                        if (squareType === "brick") {
                             return {
                                 tag: "div",
                                 attrs: {
@@ -168,8 +196,9 @@ export function gameRoom(tile, ws, setMap, setWait, setStart, winner, setWinner)
                                 }
                             };
                         }
-                        // Render wall tiles
-                        else if (`${square}` === "wall") {
+
+                        // Handle wall tiles
+                        if (squareType === "wall") {
                             return {
                                 tag: "div",
                                 attrs: {
@@ -177,144 +206,92 @@ export function gameRoom(tile, ws, setMap, setWait, setStart, winner, setWinner)
                                     class: "wall box",
                                 }
                             };
-                        } else if (`${square}` === "collision") {
-                            return (
-                                {
-                                    tag: "div",
-                                    attrs: {
-                                        class: "path box",
-                                    },
-                                    children: [
-                                        {
-                                            tag: "img",
-                                            attrs: {
-                                                src: "./assets/images/Effect_Explosion_1.gif",
-                                                class: "collision",
-                                            }
-                                        }
-                                    ]
-                                }
-                            )
-                        } else if (`${square}` === "speed") {
-                            return (
-                                {
-                                    tag: "div",
-                                    attrs: {
-                                        class: "path box",
-                                    },
-                                    children: [
-                                        {
-                                            tag: "img",
-                                            attrs: {
-                                                src: "./assets/images/speed.png",
-                                                class: "powerup-orb speed",
-                                            }
-                                        }
-                                    ]
-                                }
-                            )
-                        } else if (`${square}` === "range") {
-                            return (
-                                {
-                                    tag: "div",
-                                    attrs: {
-                                        class: "path box",
-                                    },
-                                    children: [
-                                        {
-                                            tag: "img",
-                                            attrs: {
-                                                src: "./assets/images/range.png",
-                                                class: "powerup-orb range",
-                                            }
-                                        }
-                                    ]
-                                }
-                            )
-                        } else if (`${square}` === "ExtraBomb") {
-                            return (
-                                {
-                                    tag: "div",
-                                    attrs: {
-                                        class: "path box",
-                                    },
-                                    children: [
-                                        {
-                                            tag: "img",
-                                            attrs: {
-                                                src: "./assets/images/extraBomb.png",
-                                                class: "powerup-orb ExtraBomb",
-                                            }
-                                        }
-                                    ]
-                                }
-                            )
                         }
-                        else {
-                            if (!square.includes("bomb")) {
-                                const slice = square.split("-")
-                                return {
-                                    tag: "div",
-                                    attrs: {
-                                        class: "path box",
-                                    },
-                                    children: [
-                                        ...slice.map((pl, i) => {
-                                            const player = players.find(p => p.id === pl);
-                                            if (player) {
-                                                return {
-                                                    tag: "div",
-                                                    attrs: {
-                                                        class: "path box",
-                                                    },
-                                                    children: [
-                                                        createPlayer(player)
-                                                    ]
-                                                }
-                                            }
-                                        })
-                                    ]
-                                }
-                            } else {
-                                const slice = square.split("-");
-                                if (slice.length > 1) {
-                                    return {
-                                        tag: "div",
-                                        attrs: {
-                                            class: "path box",
-                                        },
-                                        children: [
-                                            createBomb(i, j),
-                                            ...slice.slice(1).map((pl, i) => {
-                                                const player = players.find(p => p.id === pl);
-                                                if (player) {
-                                                    return {
-                                                        tag: "div",
-                                                        attrs: {
-                                                            class: "path box",
-                                                        },
-                                                        children: [
-                                                            createPlayer(player)
-                                                        ]
-                                                    }
-                                                }
-                                            })
-                                        ]
-                                    }
-                                } else {
-                                    return {
-                                        tag: "div",
-                                        attrs: {
-                                            class: "path box",
-                                        },
-                                        children: [
-                                            createBomb(i, j)
-                                        ]
-                                    }
-                                }
 
-                            }
+                        // Handle collision/explosion tiles
+                        if (squareType === "collision") {
+                            return {
+                                tag: "div",
+                                attrs: {
+                                    class: "path box",
+                                },
+                                children: [
+                                    {
+                                        tag: "img",
+                                        attrs: {
+                                            src: "./assets/images/Effect_Explosion_1.gif",
+                                            class: "collision",
+                                        }
+                                    }
+                                ]
+                            };
                         }
+
+                        // Handle speed powerup
+                        if (squareType === "speed") {
+                            return {
+                                tag: "div",
+                                attrs: {
+                                    class: "path box",
+                                },
+                                children: [
+                                    {
+                                        tag: "img",
+                                        attrs: {
+                                            src: "./assets/images/speed.png",
+                                            class: "powerup-orb speed",
+                                        }
+                                    }
+                                ]
+                            };
+                        }
+
+                        // Handle range powerup
+                        if (squareType === "range") {
+                            return {
+                                tag: "div",
+                                attrs: {
+                                    class: "path box",
+                                },
+                                children: [
+                                    {
+                                        tag: "img",
+                                        attrs: {
+                                            src: "./assets/images/range.png",
+                                            class: "powerup-orb range",
+                                        }
+                                    }
+                                ]
+                            };
+                        }
+
+                        // Handle extra bomb powerup
+                        if (squareType === "ExtraBomb") {
+                            return {
+                                tag: "div",
+                                attrs: {
+                                    class: "path box",
+                                },
+                                children: [
+                                    {
+                                        tag: "img",
+                                        attrs: {
+                                            src: "./assets/images/extraBomb.png",
+                                            class: "powerup-orb ExtraBomb",
+                                        }
+                                    }
+                                ]
+                            };
+                        }
+
+                        // Default case - return empty div or null
+                        return {
+                            tag: "div",
+                            attrs: {
+                                class: "path box",
+                            }
+                        };
+
                     }) : []
                 })) : [])
             ]
@@ -324,6 +301,8 @@ export function gameRoom(tile, ws, setMap, setWait, setStart, winner, setWinner)
 }
 
 export function createPlayer(player) {
+    console.log({ player });
+
     return {
         tag: "div",
         attrs: {
