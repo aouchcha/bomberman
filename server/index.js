@@ -278,12 +278,13 @@ wss.on("connection", (ws, req) => {
             }
 
             setTimeout(() => {
+                console.log("data explosion ===>", data)
                 for (const [key, value] of waitingRoom.players.entries()) {
                     value.send(JSON.stringify({
                         type: "after_expo1",
                     }));
                 }
-            }, 1000);
+            }, data.duration);
         } else if (data.type == "after_expo2") {
             for (let i = 0; i < grid.length; i++) {
                 for (let j = 0; j < grid[i].length; j++) {

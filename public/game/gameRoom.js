@@ -63,6 +63,7 @@ export function gameRoom(tile, ws, setMap, setWait, setStart, winner, setWinner)
                                 range: 1,
                                 speed: 250,
                                 bombs: 3,
+                                exp_duration: 1000,
                             };
                             players.push(newPlayer);
                         }

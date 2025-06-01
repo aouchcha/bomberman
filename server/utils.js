@@ -55,7 +55,7 @@ export function isEmpty(row, cell, tile) {
     return false;
 }
 
-const BRICKS_NUMBER = 50;
+const BRICKS_NUMBER = 0;
 export function addBricksToBoard(map) {
     let i = 0;
     let tileMap = map

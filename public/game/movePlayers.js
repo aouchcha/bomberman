@@ -71,6 +71,7 @@ export function movePlayer(ws, updatePlayerState, setMap, setGameover, setWinner
             ws.send(JSON.stringify({
                 type: 'test',
                 bomb: true,
+                duration: 1000,
                 players: players,
                 bombCorrds: data.position,
                 myplayer: data.myplayer,
