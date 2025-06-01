@@ -14,6 +14,7 @@ export function joining(req, res) {
         resu = JSON.parse(body);
 
         playersUsernames.add(resu.username)
+
         if (waitingRoom.status == "postCountdown" || waitingRoom.status == "grid"){
              res.writeHead(401, { 'Content-Type': 'text/html' });
             res.end(JSON.stringify({ message: "The Game already started try later" }))

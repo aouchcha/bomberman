@@ -339,6 +339,7 @@ wss.on("connection", (ws, req) => {
     })
 
     ws.on("close", () => {
+        
         let userid;
 
         for (const [key, value] of waitingRoom.players.entries()) {
@@ -360,6 +361,8 @@ wss.on("connection", (ws, req) => {
         setLength.len = playersUsernames.size;
 
         if (waitingRoom.players.size === 1) {
+        console.log("hanni");
+
             for (let i = 0; i < grid.length; i++) {
                 for (let j = 0; j < grid[i].length; j++) {
                     if (grid[i][j] !== "wall") {
