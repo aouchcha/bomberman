@@ -16,11 +16,17 @@ export function waitingRoom(ws, setWait) {
 
     const manageMsgs = {
         timer: (data) => {
-            setTimer(`Game starting in: ${data.time} seconds...`)
-            setPlayerCount(data.counter)
+            requestAnimationFrame(() => {
+                setTimer(`Game starting in: ${data.time} seconds...`)
+                setPlayerCount(data.counter)
+            })
+            // setTimer(`Game starting in: ${data.time} seconds...`)
         },
         postCountdown: (data) => {
-            setTimer(`Game starting very soon: ${data.time} seconds...`)
+            requestAnimationFrame(() => {
+                setTimer(`Game starting very soon: ${data.time} seconds...`)
+            })
+            // setTimer(`Game starting very soon: ${data.time} seconds...`)
         },
         grid: (data) => {
             if (data.players.length >= 2 && data.players.length <= 4) {
@@ -36,7 +42,10 @@ export function waitingRoom(ws, setWait) {
             }
         },
         waiting: () => {
-            setTimer("Waiting for more players...")
+            requestAnimationFrame(() => {
+                setTimer("Waiting for more players...")
+            })
+            // setTimer("Waiting for more players...")
         },
         chat: (data) => {
             setChat((prev) => [...prev, data.message])

@@ -27,186 +27,187 @@ function movingPlayerAnimation() {
 }
 
 export function movePlayer(ws, updatePlayerState, setMap, setGameover, setWinner) {
-
-    ws.onmessage = (event) => {
-        if (localStorage.getItem('player') === undefined) {
-            movingPlayerAnimation();
-            ws.send(JSON.stringify({
-                type: "lose",
-                myplayer: myPlayer
-            }))
-            return
-        }
-        const data = JSON.parse(event.data);
-        if (data.type == "gameover") {
-            ws.close();
-            updatePlayers([])
-            setMap([])
-            setWinner(true)
-            return;
-        }
-        if (data.type === "mouvement") {
-            players.forEach(player => {
-                if (player.id == data.id) {
-                    player.position = data.position;
-                    player.direction = data.direction;
-                }
-                updatePlayerState(data.players)
-
-            });
-            updatePlayers(data.players);
-        }
-        else if (data.type === "self-update") {
-            myPlayer.position = data.position;
-            myPlayer.direction = data.direction;
-
-            updatePlayerState(data.myplayer)
-            updatePlayers(data.players);
-        }
-        else if (data.type === "bombPlaced") {
-            setMap(data.grid)
-        }
-        else if (data.type === "bombExploded") {
-            ws.send(JSON.stringify({
-                type: 'test',
-                bomb: true,
-                players: players,
-                bombCorrds: data.position,
-                myplayer: data.myplayer,
-            }));
-        } else if (data.type == "expo") {
-
-            updatePlayers(data.players);
-            movingPlayerAnimation()
-
-            if (myPlayer.lives == 0) {
+    requestAnimationFrame(() => {
+        ws.onmessage = (event) => {
+            if (localStorage.getItem('player') === undefined) {
+                movingPlayerAnimation();
                 ws.send(JSON.stringify({
                     type: "lose",
                     myplayer: myPlayer
                 }))
+                return
             }
-            ResetPlayers(data.players)
-            if (players.length == 1) {
+            const data = JSON.parse(event.data);
+            if (data.type == "gameover") {
+                ws.close();
+                updatePlayers([])
+                setMap([])
+                setWinner(true)
+                return;
+            }
+            if (data.type === "mouvement") {
+                players.forEach(player => {
+                    if (player.id == data.id) {
+                        player.position = data.position;
+                        player.direction = data.direction;
+                    }
+                    updatePlayerState(data.players)
+
+                });
+                updatePlayers(data.players);
+            }
+            else if (data.type === "self-update") {
+                myPlayer.position = data.position;
+                myPlayer.direction = data.direction;
+
+                updatePlayerState(data.myplayer)
+                updatePlayers(data.players);
+            }
+            else if (data.type === "bombPlaced") {
+                setMap(data.grid)
+            }
+            else if (data.type === "bombExploded") {
                 ws.send(JSON.stringify({
-                    type: "win",
+                    type: 'test',
+                    bomb: true,
+                    players: players,
+                    bombCorrds: data.position,
+                    myplayer: data.myplayer,
+                }));
+            } else if (data.type == "expo") {
+
+                updatePlayers(data.players);
+                movingPlayerAnimation()
+
+                if (myPlayer.lives == 0) {
+                    ws.send(JSON.stringify({
+                        type: "lose",
+                        myplayer: myPlayer
+                    }))
+                }
+                ResetPlayers(data.players)
+                if (players.length == 1) {
+                    ws.send(JSON.stringify({
+                        type: "win",
+                        myplayer: myPlayer
+                    }))
+                }
+                setMap(data.grid);
+            } else if (data.type === "after_expo1") {
+                movingPlayerAnimation(' ', ' ', directions.keySpace);
+                ws.send(JSON.stringify({
+                    type: 'after_expo2',
+                    players: players,
                     myplayer: myPlayer
-                }))
+                }));
+
+            } else if (data.type === "newgrid") {
+                updatePlayers(data.players);
+                setMap(data.grid);
             }
-            setMap(data.grid);
-        } else if (data.type === "after_expo1") {
-            movingPlayerAnimation(' ', ' ', directions.keySpace);
-            ws.send(JSON.stringify({
-                type: 'after_expo2',
-                players: players,
-                myplayer: myPlayer
-            }));
+            else if (data.type === "powerUpCollected") {
+                ws.send(JSON.stringify({
+                    type: 'powerUpCollected',
+                    players: players,
+                    myplayer: myPlayer
+                }));
+                updatePlayers(data.players);
+            }
+            else if (data.type === "powerUpCollected2") {
+                updatePlayers(data.players);
+                setMap(data.grid);
+            } else if (data.type == "lose") {
+                ws.close();
+                updatePlayers([])
+                setMap([])
+                setGameover(true)
+            } else if (data.type == "win") {
+                ws.close();
+                updatePlayers([])
+                setMap([])
+                setWinner(true)
+            }
 
-        } else if (data.type === "newgrid") {
-            updatePlayers(data.players);
-            setMap(data.grid);
         }
-        else if (data.type === "powerUpCollected") {
-            ws.send(JSON.stringify({
-                type: 'powerUpCollected',
-                players: players,
-                myplayer: myPlayer
-            }));
-            updatePlayers(data.players);
-        }
-        else if (data.type === "powerUpCollected2") {
-            updatePlayers(data.players);
-            setMap(data.grid);
-        } else if (data.type == "lose") {
-            ws.close();
-            updatePlayers([])
-            setMap([])
-            setGameover(true)
-        } else if (data.type == "win") {
-            ws.close();
-            updatePlayers([])
-            setMap([])
-            setWinner(true)
-        }
-    }
-
+    });
 
     document.onkeyup = (event) => {
         // if (move) {
-            // const currentTime = Date.now();
-            // const requiredDelay = 16.67;
-            switch (event.key) {
-                case 'ArrowUp':
-                    //  move = false
-                    // if (currentTime - LastMvmt >= requiredDelay) {
-                    movingPlayerAnimation(event.key, event.key, directions.keyUp);
-                    ws.send(JSON.stringify({
-                        type: 'move',
-                        direction: directions.keyUp,
-                        position: myPlayer.position,
-                        username: myPlayer.id,
-                        lastKey: 'z',
-                        myplayer: myPlayer,
-                        players: players
-                    }));
-                    // }
-                    // LastMvmt = currentTime;
-                    break;
-                case 'ArrowLeft':
-                    //  move = false
-                    // if (currentTime - LastMvmt >= requiredDelay) {
+        // const currentTime = Date.now();
+        // const requiredDelay = 16.67;
+        switch (event.key) {
+            case 'ArrowUp':
+                //  move = false
+                // if (currentTime - LastMvmt >= requiredDelay) {
+                movingPlayerAnimation(event.key, event.key, directions.keyUp);
+                ws.send(JSON.stringify({
+                    type: 'move',
+                    direction: directions.keyUp,
+                    position: myPlayer.position,
+                    username: myPlayer.id,
+                    lastKey: 'z',
+                    myplayer: myPlayer,
+                    players: players
+                }));
+                // }
+                // LastMvmt = currentTime;
+                break;
+            case 'ArrowLeft':
+                //  move = false
+                // if (currentTime - LastMvmt >= requiredDelay) {
 
-                    movingPlayerAnimation(event.key, event.key, directions.keyLeft);
-                    ws.send(JSON.stringify({
-                        type: 'move',
-                        direction: directions.keyLeft,
-                        position: myPlayer.position,
-                        username: myPlayer.id,
-                        lastKey: 'a',
-                        myplayer: myPlayer,
-                        players: players
-                    }));
-                    // }
-                    // LastMvmt = currentTime;
-                    break;
-                case 'ArrowDown':
-                    //  move = false
-                    // if (currentTime - LastMvmt >= requiredDelay) {
+                movingPlayerAnimation(event.key, event.key, directions.keyLeft);
+                ws.send(JSON.stringify({
+                    type: 'move',
+                    direction: directions.keyLeft,
+                    position: myPlayer.position,
+                    username: myPlayer.id,
+                    lastKey: 'a',
+                    myplayer: myPlayer,
+                    players: players
+                }));
+                // }
+                // LastMvmt = currentTime;
+                break;
+            case 'ArrowDown':
+                //  move = false
+                // if (currentTime - LastMvmt >= requiredDelay) {
 
-                    movingPlayerAnimation(event.key, event.key, directions.keyDown);
-                    ws.send(JSON.stringify({
-                        type: 'move',
-                        direction: directions.keyDown,
-                        position: myPlayer.position,
-                        username: myPlayer.id,
-                        lastKey: 's',
-                        myplayer: myPlayer,
-                        players: players
-                    }));
-                    // }
-                    // LastMvmt = currentTime;
-                    break;
-                case 'ArrowRight':
-                    //  move = false
-                    // if (currentTime - LastMvmt >= requiredDelay) {
-                    movingPlayerAnimation(event.key, event.key, directions.keyRight);
-                    ws.send(JSON.stringify({
-                        type: 'move',
-                        direction: directions.keyRight,
-                        position: myPlayer.position,
-                        username: myPlayer.id,
-                        lastKey: 'd',
-                        myplayer: myPlayer,
-                        players: players
-                    }));
-                    // }
-                    // LastMvmt = currentTime;
-                    break;
-                case ' ':
-                    //  move = false
-                    movingPlayerAnimation(event.key, event.key, directions.keySpace);
-                    bombing(ws, myPlayer)
-                    break;
-            }
+                movingPlayerAnimation(event.key, event.key, directions.keyDown);
+                ws.send(JSON.stringify({
+                    type: 'move',
+                    direction: directions.keyDown,
+                    position: myPlayer.position,
+                    username: myPlayer.id,
+                    lastKey: 's',
+                    myplayer: myPlayer,
+                    players: players
+                }));
+                // }
+                // LastMvmt = currentTime;
+                break;
+            case 'ArrowRight':
+                //  move = false
+                // if (currentTime - LastMvmt >= requiredDelay) {
+                movingPlayerAnimation(event.key, event.key, directions.keyRight);
+                ws.send(JSON.stringify({
+                    type: 'move',
+                    direction: directions.keyRight,
+                    position: myPlayer.position,
+                    username: myPlayer.id,
+                    lastKey: 'd',
+                    myplayer: myPlayer,
+                    players: players
+                }));
+                // }
+                // LastMvmt = currentTime;
+                break;
+            case ' ':
+                //  move = false
+                movingPlayerAnimation(event.key, event.key, directions.keySpace);
+                bombing(ws, myPlayer)
+                break;
+        }
         // };
     }
 
