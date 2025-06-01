@@ -14,6 +14,10 @@ export function renderApp() {
     async function checkUserName(e) {
         if (username.trim().length == 0) return 
         if (e.key == 'Enter') {
+            if (localStorage.getItem("player") != undefined) {
+                console.log("already there is a player");
+                return
+            }
             const response = await fetch("/join", {
                 method: 'POST',
                 headers: {
@@ -42,6 +46,11 @@ export function renderApp() {
             }
 
         }
+    }
+
+    window.onbeforeunload = () => {
+         console.log('Page is unloading')
+         localStorage.removeItem('player')
     }
 
     return (

@@ -3,7 +3,7 @@ import { useState } from "../Apex/core.js";
 import { Routes } from "../Apex/router.js";
 
 export let players = [];
-
+// export let move = false;
 export function ResetPlayers(ps) {
     players = ps.filter((pl) => {
         return pl.lives > 0
@@ -13,7 +13,7 @@ export function ResetPlayers(ps) {
 export function updatePlayers(ps) {
     players = ps
 }
-export function gameRoom(tile, ws, setMap, setWait, setStart) {
+export function gameRoom(tile, ws, setMap, setWait, setStart, winner, setWinner) {
 
     const [error, setError] = useState(false)
     const [routes, SetRoutes] = useState([
@@ -22,7 +22,7 @@ export function gameRoom(tile, ws, setMap, setWait, setStart) {
     ])
     Routes(routes)
     const [gameover, setGameover] = useState(false)
-    const [winner, setWinner] = useState(false)
+
 
     const [gameState, setGameState] = useState({
         players: [],
@@ -72,7 +72,9 @@ export function gameRoom(tile, ws, setMap, setWait, setStart) {
         });
 
     }
+//    window.requestAnimationFrame(
     movePlayer(ws, updatePlayerState, setMap, setGameover, setWinner)
+// )
 
     return (
         error ? {

@@ -12,6 +12,7 @@ export function waitingRoom(ws, setWait) {
     const [start, setStart] = useState(false);
     const [map, setMap] = useState();
     const [playerCount, setPlayerCount] = useState(1);
+    const [winner, setWinner] = useState(false)
 
     const manageMsgs = {
         timer: (data) => {
@@ -34,7 +35,7 @@ export function waitingRoom(ws, setWait) {
                 console.log("The time allowed for new players to enter has passed.");
             }
         },
-        waiting: (data) => {
+        waiting: () => {
             setTimer("Waiting for more players...")
         },
         chat: (data) => {
@@ -44,6 +45,11 @@ export function waitingRoom(ws, setWait) {
             console.log("Counter received:", data.counter);
             setPlayerCount(data.counter);
         },
+        gameover: () => {
+            ws.close()
+
+            setWinner(true);
+        }
     }
     if (currentMessageHandler) {
         ws.removeEventListener("message", currentMessageHandler);
@@ -59,7 +65,28 @@ export function waitingRoom(ws, setWait) {
     // Add the new message handler
     ws.onmessage = (e) => currentMessageHandler(e);
     return (
-        !start ? {
+        winner ? {
+            tag: "div",
+            attrs: {
+                class: "message",
+            },
+            children: [
+                {
+                    tag: "p",
+                    children: [`You Win The Game`]
+                }, {
+                    tag: "button",
+                    attrs: {
+                        onclick: () => {
+                            setWait(true),
+                                setWinner(false),
+                                setStart(false)
+                        }
+                    },
+                    children: ['Restart The game']
+                }
+            ]
+        } : !start ? {
             tag: "div",
             children: [
                 {
@@ -98,7 +125,7 @@ export function waitingRoom(ws, setWait) {
                 Chat(chat, ws, start),
                 createBackgroundMusic(),
                 createMusicToggleButton(),
-                gameRoom(map, ws, setMap, setWait, setStart)
+                gameRoom(map, ws, setMap, setWait, setStart, winner, setWinner)
             ]
         }
     )
