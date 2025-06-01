@@ -54,6 +54,7 @@ export function renderApp() {
     }
 
     return (
+        //
         wait ? {
             tag: "div",
             attrs: {
