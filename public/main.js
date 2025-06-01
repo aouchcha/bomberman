@@ -12,7 +12,7 @@ export function renderApp() {
 
 
     async function checkUserName(e) {
-        if (username.trim().length == 0) return 
+        if (username.trim().length == 0) return
         if (e.key == 'Enter') {
             if (localStorage.getItem("player") != undefined) {
                 console.log("already there is a player");
@@ -49,24 +49,37 @@ export function renderApp() {
     }
 
     window.onbeforeunload = () => {
-         console.log('Page is unloading')
-         localStorage.removeItem('player')
+        console.log('Page is unloading')
+        localStorage.removeItem('player')
     }
 
     return (
         wait ? {
-            tag: "input",
+            tag: "div",
             attrs: {
-                type: "text",
-                value: username,
-                placeholder: "Enter username",
-                autofocus: 'autofocus',
-                // style: wait ? "display:flex" : "display:none",
-                oninput: (e) => {
-                    setUsername(e.target.value)
+                class: 'username-container'
+            },
+            children: [
+                {
+                    tag: "h2",
+                    children: ["Welcome!"],
                 },
-                onkeydown: async (e) => await checkUserName(e)
-            }
+                {
+                    tag: "input",
+                    attrs: {
+                        type: "text",
+                        name: "username",
+                        value: username,
+                        placeholder: "Enter username",
+                        autofocus: 'autofocus',
+                        // style: wait ? "display:flex" : "display:none",
+                        oninput: (e) => {
+                            setUsername(e.target.value)
+                        },
+                        onkeydown: async (e) => await checkUserName(e)
+                    }
+                }
+            ]
         } : waitingRoom(ws, setWait)
     )
 }
